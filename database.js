@@ -268,3 +268,37 @@ function getWarehouseById(warehouseId) {
     if (!warehouseId) return null;
     return db.warehouses.find(w => w.id === warehouseId);
 }
+/**
+ * מעדכן את רשימת הציוד המשויך לפעילות
+ * @param {string} activityId - ה-ID של הפעילות לעדכון
+ * @param {Array<string>} newEquipmentIds - רשימת ה-ID המלאה של הציוד שנבחר
+ */
+function updateActivityEquipment(activityId, newEquipmentIds) {
+    const activity = getActivityById(activityId);
+    if (!activity) {
+        console.error("לא נמצאה פעילות לעדכון:", activityId);
+        return;
+    }
+
+    // נאתחל מחדש את שתי הרשימות בפעילות
+    activity.equipmentRequiredIds = [];
+    activity.equipmentMissingIds = [];
+
+    // נעבור על כל ה-ID-ים שנבחרו
+    newEquipmentIds.forEach(itemId => {
+        const item = getEquipmentById(itemId);
+        if (item) {
+            // נמיין את הפריטים לפי הלוגיקה
+            // רק פריטים כשירים או בטעינה ייכנסו לרשימת ה"כשירים"
+            if (item.status === 'available' || item.status === 'charging') {
+                activity.equipmentRequiredIds.push(item.id);
+            } else {
+                // כל פריט אחר (שלא היה אמור להיבחר) ייכנס לרשימת ה"חסרים"
+                activity.equipmentMissingIds.push(item.id);
+            }
+        }
+    });
+
+    console.log(`פעילות ${activityId} עודכנה עם ${activity.equipmentRequiredIds.length} פריטים כשירים ו-${activity.equipmentMissingIds.length} פערים.`);
+    saveDB(); // נשמור את השינויים ב-DB
+}
