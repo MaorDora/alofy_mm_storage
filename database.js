@@ -223,3 +223,30 @@ function updateEquipmentStatus(equipmentId, newStatus) {
         console.error(`לא נמצא פריט עם ID: ${equipmentId}`);
     }
 }
+/**
+ * מעדכן פריט ציוד קיים עם נתונים חדשים מהטופס
+ @param {string} equipmentId - ה-ID של הפריט לעדכון
+ @param {Object} newData - אובייקט עם השדות החדשים לעדכון
+ */
+function updateEquipmentItem(equipmentId, newData) {
+    const item = getEquipmentById(equipmentId);
+    if (!item) {
+        console.error(`לא נמצא פריט לעדכון עם ID: ${equipmentId}`);
+        return false;
+    }
+
+    // עדכן את כל השדות שהתקבלו מהטופס
+    item.name = newData.name;
+    item.managerUserId = newData.managerUserId;
+    item.lastCheckDate = newData.lastCheckDate;
+    item.status = newData.status;
+    item.warehouseId = newData.warehouseId;
+
+    // אנו שומרים על המידע למי הושאל הפריט, אם הוא הושאל
+    if (newData.status !== 'loaned') {
+        item.loanedToUserId = null;
+    }
+
+    console.log(`פריט ${equipmentId} עודכן בהצלחה.`);
+    return true;
+}

@@ -114,11 +114,14 @@ function changeStatus(newStatusClass, newStatusText) {
 function editItemDetails() {
     if (!currentItemElement) return;
     const itemId = currentItemElement.dataset.id;
-    // זו האלטרנטיבה הנכונה והבטוחה:
     const item = getEquipmentById(itemId);
-    const itemName = item ? item.name : "פריט";
+    if (!item) {
+        console.error("לא ניתן לערוך. לא נמצא פריט עם ID:", itemId);
+        return;
+    }
     closeStatusModal();
-    showPage('screen-edit-item', 'עריכת פריט: ' + itemName);
+    // קריאה לפונקציה חדשה שמכינה את טופס העריכה
+    prepareAndShowEditItemPage(item);
 }
 
 function openResolveGapModal(itemName) {
@@ -295,13 +298,48 @@ function prepareAndShowAddItemPage() {
 /**
  * מכין ומציג את עמוד הוספת הפעילות
  */
-function prepareAndShowAddActivityPage() {
-    populateAddActivityForm();
+function prepareAndShowAddItemPage() {
+    // 1. אכלס את רשימות הבחירה
+    populateAddItemForm();
+
+    // 2. נקה את הטופס וודא שהוא במצב "הוספה"
+    const form = document.getElementById('add-item-form');
+    form.reset(); // נקה את כל השדות
+    form.dataset.editId = ""; // נקה ID עריכה
+
+    // 3. אפס את הכותרת וכפתור השמירה
+    document.getElementById('add-item-title').innerText = 'הוסף פריט חדש';
+    document.getElementById('add-item-submit-btn').innerText = 'שמור פריט';
+
+    // 4. סגור את המודאל והצג את העמוד
     closeQuickAddModal();
-    showPage('screen-add-activity', 'הוסף פעילות חדשה');
+    showPage('screen-add-item', 'הוסף פריט חדש');
 }
+/**
+ * מכין ומציג את עמוד הוספת הפריט במצב "עריכה"
+ * @param {Object} item - אובייקט הפריט לעריכה
+ */
+function prepareAndShowEditItemPage(item) {
+    // 1. אכלס את רשימות הבחירה (כמו בטופס חדש)
+    populateAddItemForm();
 
+    // 2. מלא את שדות הטופס עם המידע הקיים
+    document.getElementById('item-name').value = item.name;
+    document.getElementById('item-warehouse-select').value = item.warehouseId;
+    document.getElementById('item-manager-select').value = item.managerUserId;
+    document.getElementById('item-status-select').value = item.status;
+    document.getElementById('item-check-date').value = item.lastCheckDate;
 
+    // 3. שנה את הכותרת וכפתור השמירה
+    document.getElementById('add-item-title').innerText = 'עריכת פריט';
+    document.getElementById('add-item-submit-btn').innerText = 'עדכן פריט';
+
+    // 4. שמור את ה-ID של הפריט הנערך על הטופס
+    document.getElementById('add-item-form').dataset.editId = item.id;
+
+    // 5. הצג את העמוד
+    showPage('screen-add-item', 'עריכת פריט: ' + item.name);
+}
 /* =================================
 מטפלי אירועים (Event Handlers) - חדש
 =================================
@@ -310,8 +348,13 @@ function prepareAndShowAddActivityPage() {
 /**
  * מטפל בשליחת טופס הוספת פריט
  */
+/**
+ * מטפל בשליחת טופס הוספת/עריכת פריט
+ */
 function handleAddItemSubmit(event) {
-    event.preventDefault(); // מנע שליחה רגילה של הטופס
+    event.preventDefault(); // מנע שליחה רגילה
+    const form = event.target;
+    const editId = form.dataset.editId; // בדוק אם אנחנו במצב עריכה
 
     // 1. קרא נתונים מהטופס
     const name = document.getElementById('item-name').value;
@@ -320,34 +363,60 @@ function handleAddItemSubmit(event) {
     const status = document.getElementById('item-status-select').value;
     const lastCheckDate = document.getElementById('item-check-date').value;
 
-    // 2. ולידציה בסיסית (למרות שיש required)
+    // 2. ולידציה בסיסית
     if (!name || !warehouseId || !managerUserId || !status || !lastCheckDate) {
         alert("אנא מלא את כל השדות.");
         return;
     }
 
-    // 3. צור אובייקט חדש
-    const newItem = {
-        id: 'eq-' + Date.now(), // ID ייחודי פשוט
+    // 3. צור אובייקט נתונים
+    const itemData = {
         name: name,
         managerUserId: managerUserId,
         lastCheckDate: lastCheckDate,
         status: status,
-        warehouseId: warehouseId,
-        loanedToUserId: null
+        warehouseId: warehouseId
     };
 
-    // 4. הוסף ל-DB ושמור
-    db.equipment.push(newItem);
-    saveDB();
+    if (editId) {
+        // --- מצב עריכה ---
 
-    // 5. תן חיווי, רענן UI, ונווט חזרה
-    alert("פריט חדש נוסף בהצלחה!");
-    event.target.reset(); // נקה את הטופס
-    renderWarehouseList(); // רענן את רשימת המחסנים (לצורך עדכון ספירת פריטים)
-    showPage('screen-warehouses-list');
+        // 4א. קרא לפונקציית העדכון החדשה ב-database.js
+        updateEquipmentItem(editId, itemData);
+        saveDB(); // שמור שינויים
+
+        // 5א. חיווי, רענון, ניווט
+        alert("הפריט עודכן בהצלחה!");
+        form.reset(); // נקה את הטופס
+        form.dataset.editId = ""; // נקה מצב עריכה
+
+        // רענן את הרשימות הרלוונטיות
+        renderWarehouseList(); // רענון ספירת פריטים כללית
+        renderWarehouseDetails(itemData.warehouseId); // רענון המסך ממנו באנו
+
+        // נווט חזרה למסך פרטי המחסן
+        const warehouse = db.warehouses.find(w => w.id === itemData.warehouseId);
+        const warehouseTitle = warehouse ? warehouse.name : "פרטי מחסן";
+        showPage('screen-warehouse-details', warehouseTitle);
+
+    } else {
+        // --- מצב הוספה (הלוגיקה הקיימת) ---
+
+        // 4ב. צור ID חדש והוסף שדות חסרים
+        itemData.id = 'eq-' + Date.now(); // ID ייחודי פשוט
+        itemData.loanedToUserId = null;
+
+        // 5ב. הוסף ל-DB ושמור
+        db.equipment.push(itemData);
+        saveDB();
+
+        // 6ב. חיווי, רענון, ניווט
+        alert("פריט חדש נוסף בהצלחה!");
+        form.reset(); // נקה את הטופס
+        renderWarehouseList(); // רענן את רשימת המחסנים
+        showPage('screen-warehouses-list');
+    }
 }
-
 /**
  * מטפל בשליחת טופס הוספת פעילות
  */
