@@ -1076,3 +1076,171 @@ body {
     margin-top: 10px;
     /* קצת פחות מ-30px כדי שיהיה קרוב יותר */
 }
+
+
+/* =================================
+סגנונות חדשים למסך עריכת ציוד
+=================================
+*/
+
+
+/* --- 1. סרגל חיפוש ופילטור --- */
+
+.search-filter-container {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-bar {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    background-color: var(--input-bg-color);
+    border-radius: 10px;
+    padding: 0 12px;
+    border: 1px solid var(--input-bg-color);
+}
+
+.search-bar:focus-within {
+    border-color: var(--action-color);
+    box-shadow: 0 0 0 2px rgba(52, 183, 235, 0.3);
+}
+
+.search-bar input {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    padding: 12px 0;
+    font-size: 16px;
+    font-family: 'Heebo', sans-serif;
+}
+
+.search-bar input:focus {
+    outline: none;
+}
+
+.btn-filter {
+    background: var(--input-bg-color);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-filter svg {
+    fill: var(--text-primary);
+}
+
+
+/* --- 2. רשימת בחירת ציוד --- */
+
+.equipment-selection-list {
+    /* הגובה ינוהל ע"י ה-page, לא צריך גלילה פנימית בינתיים */
+    /* max-height: 500px; */
+    /* overflow-y: auto; */
+}
+
+
+/* הסרת הגלילה הפנימית אם תתווסף */
+
+.equipment-selection-list::-webkit-scrollbar {
+    display: none;
+}
+
+.equipment-selection-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.equipment-select-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.equipment-select-item:last-child {
+    border-bottom: none;
+}
+
+.equipment-select-item .equipment-item-content {
+    flex-grow: 1;
+    border-bottom: none;
+    /* הסרת קו תחתון כפול */
+    cursor: default;
+    /* הסרת סמן העכבר */
+}
+
+.equipment-select-checkbox {
+    padding: 0 16px;
+}
+
+
+/* --- 3. עיצוב צ'קבוקס מותאם אישית (עגול) --- */
+
+.equipment-select-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.equipment-select-checkbox label {
+    display: block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.equipment-select-checkbox input[type="checkbox"]:checked+label {
+    background-color: var(--action-color);
+    border-color: var(--action-color);
+    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%23ffffff%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%2720%206%209%2017%204%2012%27%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-size: 16px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.equipment-select-checkbox input[type="checkbox"]:disabled+label {
+    background-color: #444;
+    border-color: #555;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+
+/* התאמת פריט מושבת */
+
+.equipment-select-item.disabled .equipment-item-content {
+    opacity: 0.5;
+}
+
+
+/* --- 4. כפתור תחתון דביק --- */
+
+.sticky-footer-btn {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    padding-bottom: 30px;
+    /* התאמה לאייפון */
+    background-color: var(--card-bg-color);
+    border-top: 1px solid #444;
+    z-index: 50;
+}
+
+.sticky-footer-btn .btn-primary {
+    margin-top: 0;
+}
+
+#screen-edit-activity-equipment .details-card {
+    margin-bottom: 120px;
+    /* מרווח גדול בתחתית הרשימה כדי לא להסתיר מאחורי הכפתור */
+}

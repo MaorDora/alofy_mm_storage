@@ -825,11 +825,28 @@ function setupGlobalEventListeners() {
                 // מחזיר לרשימת הפעילויות
                 btn.onclick = () => showPage('screen-activities-list');
             }
+            // --- הוסף את הבלוק הזה ---
+            if (page.id === 'screen-edit-activity-equipment') {
+                // זה מחזיר למסך פרטי הפעילות
+                btn.onclick = () => showPage('screen-activity-details');
+            }
+            // ------------------------
         }
     });
 
     // *** האזנה לרשימות דינמיות (Event Delegation) ***
+    // --- האזנה לכפתור עריכת ציוד בפעילות ---
+    const editActivityBtn = document.getElementById('edit-activity-equipment-btn');
+    if (editActivityBtn) {
+        editActivityBtn.onclick = () => {
+            // בשלב הבא, נצטרך להעביר לכאן את מזהה הפעילות
+            // const activityId = ...; 
+            // renderEquipmentSelectionList(activityId);
 
+            // בינתיים, רק מנווטים
+            showPage('screen-edit-activity-equipment', 'עריכת ציוד');
+        };
+    }
     // --- האזנה לקליקים על רשימת המחסנים ---
     const warehouseListPage = document.getElementById('screen-warehouses-list');
     if (warehouseListPage) {
