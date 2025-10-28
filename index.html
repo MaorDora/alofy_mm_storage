@@ -318,7 +318,7 @@
                 </div>
 
                 <div class="container">
-                    <form id="add-item-form">
+                    <form id="add-item-form" data-edit-id="">
                         <div class="form-group">
                             <label for="item-name">שם הפריט</label>
                             <input type="text" id="item-name" placeholder="לדוגמה: סנסור #104" required>
@@ -353,7 +353,7 @@
                             <input type="date" id="item-check-date" required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">שמור פריט</button>
+                        <button type="submit" class="btn btn-primary" id="add-item-submit-btn">שמור פריט</button>
                     </form>
                 </div>
             </div>
@@ -382,7 +382,7 @@
                             <input type="date " id="activity-date" required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">שמור פעילות</button>
+                        <button type="submit" id="add-item-submit-btn" class="btn btn-primary">שמור פעילות</button>
                     </form>
                 </div>
             </div>

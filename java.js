@@ -289,11 +289,6 @@ function populateAddActivityForm() {
 /**
  * מכין ומציג את עמוד הוספת הפריט
  */
-function prepareAndShowAddItemPage() {
-    populateAddItemForm();
-    closeQuickAddModal();
-    showPage('screen-add-item', 'הוסף פריט חדש');
-}
 
 /**
  * מכין ומציג את עמוד הוספת הפעילות
@@ -314,6 +309,25 @@ function prepareAndShowAddItemPage() {
     // 4. סגור את המודאל והצג את העמוד
     closeQuickAddModal();
     showPage('screen-add-item', 'הוסף פריט חדש');
+}
+// --- פונקציות מעטפת להכנה והצגה ---
+
+/**
+ * מכין ומציג את עמוד הוספת הפעילות
+ */
+function prepareAndShowAddActivityPage() {
+    // 1. אכלס את רשימת האחראים
+    populateAddActivityForm();
+
+    // 2. איפוס טופס הפעילות (למקרה שנשאר מידע)
+    const form = document.getElementById('add-activity-form');
+    if (form) {
+        form.reset();
+    }
+
+    // 3. סגור את המודאל והצג את העמוד
+    closeQuickAddModal();
+    showPage('screen-add-activity', 'הוסף פעילות חדשה');
 }
 /**
  * מכין ומציג את עמוד הוספת הפריט במצב "עריכה"
