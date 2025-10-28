@@ -253,6 +253,7 @@ function renderActivityList() {
 
 /**
  * מרנדר את עמוד פרטי הפעילות עם נתונים מה-DB
+ * (גרסה משודרגת שבודקת סטטוס עדכני של פריטים)
  * @param {string} activityId - ה-ID של הפעילות לטעינה
  */
 function renderActivityDetails(activityId) {
@@ -261,7 +262,10 @@ function renderActivityDetails(activityId) {
         console.error("לא נמצאה פעילות עם ID:", activityId);
         return;
     }
+
+    // "שתילת" ה-ID על המסך כדי שכפתור "ערוך" ימצא אותו
     document.getElementById('screen-activity-details').dataset.activityId = activityId;
+
     // 1. מצא את האלמנטים ב-DOM
     const statusTitleEl = document.getElementById('activity-status-title');
     const missingListEl = document.getElementById('activity-missing-list');
@@ -271,58 +275,78 @@ function renderActivityDetails(activityId) {
     missingListEl.innerHTML = "";
     assignedListEl.innerHTML = "";
 
-    // 3. עדכן כותרת סטטוס
-    const totalRequired = activity.equipmentRequiredIds.length;
-    const totalMissing = activity.equipmentMissingIds.length;
-    const totalItems = totalRequired + totalMissing;
-    statusTitleEl.innerText = `סטטוס בד"ח (${totalRequired}/${totalItems})`;
+    // --- הלוגיקה החדשה ---
+    // 3. אנו בונים רשימות חדשות על בסיס הסטטוס העדכני
+    const finalAssignedIds = [];
+    const finalMissingIds = []; // פריטים שהתקלקלו + פריטים שהיו חסרים
+    const statusMap = {
+        'broken': 'לא כשיר',
+        'repair': 'בתיקון',
+        'loaned': 'הושאל'
+    };
 
-    // 4. רנדר פריטים חסרים (מהמערך equipmentMissingIds)
-    if (totalMissing > 0) {
-        activity.equipmentMissingIds.forEach(itemId => {
-            const item = getEquipmentById(itemId);
-            if (item) {
-                // קוד כדי לתרגם סטטוסים של הפריט לטקסט
-                const statusMap = {
-                    'broken': 'לא כשיר',
-                    'repair': 'בתיקון',
-                    'charging': 'בטעינה',
-                    'loaned': 'הושאל'
-                };
-                const itemStatusText = statusMap[item.status] || item.status; //
-
-                const itemHtml = `
-                    <div class="status-item missing" onclick="openResolveGapModal('${item.name}')">
-                        <span class="status-item-icon icon-red">&times;</span>
-                        <div class="status-item-details">
-                            <div class="status-item-title">${item.name} (נדרש)</div>
-                            <div class="status-item-subtitle">סטטוס נוכחי: ${itemStatusText}. לחץ לטיפול...</div>
-                        </div>
-                    </div>
-                `;
-                missingListEl.innerHTML += itemHtml;
+    // 4. בדוק את כל הפריטים ש"אמורים" להיות כשירים
+    activity.equipmentRequiredIds.forEach(itemId => {
+        const item = getEquipmentById(itemId);
+        if (item) {
+            // האם הפריט עדיין כשיר?
+            if (item.status === 'available' || item.status === 'charging') {
+                finalAssignedIds.push(item);
+            } else {
+                // הפריט התקלקל! הוסף אותו לרשימת החסרים
+                finalMissingIds.push(item);
             }
+        }
+    });
+
+    // 5. הוסף את הפריטים ש"כבר" היו חסרים
+    activity.equipmentMissingIds.forEach(itemId => {
+        const item = getEquipmentById(itemId);
+        if (item) {
+            finalMissingIds.push(item);
+        }
+    });
+    // --- סוף הלוגיקה החדשה ---
+
+
+    // 6. עדכן כותרת סטטוס (לפי הרשימות החדשות)
+    const totalAssigned = finalAssignedIds.length;
+    const totalMissing = finalMissingIds.length;
+    const totalItems = totalAssigned + totalMissing;
+    statusTitleEl.innerText = `סטטוס בד"ח (${totalAssigned}/${totalItems})`;
+
+    // 7. רנדר פריטים חסרים (finalMissingIds)
+    if (totalMissing > 0) {
+        finalMissingIds.forEach(item => {
+            const itemStatusText = statusMap[item.status] || item.status;
+            const itemHtml = `
+                <div class="status-item missing" onclick="openResolveGapModal('${item.name}')">
+                    <span class="status-item-icon icon-red">&times;</span>
+                    <div class="status-item-details">
+                        <div class="status-item-title">${item.name} (נדרש)</div>
+                        <div class="status-item-subtitle">סטטוס נוכחי: ${itemStatusText}. לחץ לטיפול...</div>
+                    </div>
+                </div>
+            `;
+            missingListEl.innerHTML += itemHtml;
         });
     }
 
-    // 5. רנדר פריטים כשירים ומשוריינים (מהמערך equipmentRequiredIds)
-    if (totalRequired === 0) {
+    // 8. רנדר פריטים כשירים ומשוריינים (finalAssignedIds)
+    if (totalAssigned === 0) {
         assignedListEl.innerHTML = `<p style="color: var(--text-secondary); padding: 10px 0; text-align: center;">לא שוריין ציוד לפעילות זו.</p>`;
     } else {
-        activity.equipmentRequiredIds.forEach(itemId => {
-            const item = getEquipmentById(itemId);
-            if (item) {
-                const itemHtml = `
-                    <div class="status-item assigned">
-                        <span class="status-item-icon icon-green">&#10003;</span>
-                        <div class="status-item-details">
-                            <div class="status-item-title">${item.name}</div>
-                            <div class="status-item-subtitle">(כשיר, שוריין)</div>
-                        </div>
+        finalAssignedIds.forEach(item => {
+            const itemHtml = `
+                <div class="status-item assigned">
+                    <span class="status-item-icon icon-green">&#10003;</span>
+                    <div class="status-item-details">
+                        <div class="status-item-title">${item.name}</div>
+                        <div class="status-item-subtitle">(כשיר, שוריין)</div>
                     </div>
-                `;
-                assignedListEl.innerHTML += itemHtml;
-            }
+                </div>
+            `;
+            assignedListEl.innerHTML += itemHtml;
         });
     }
 }
