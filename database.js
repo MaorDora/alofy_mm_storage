@@ -259,3 +259,12 @@ function getActivityById(activityId) {
     if (!activityId) return null;
     return db.activities.find(act => act.id === activityId);
 }
+/**
+ * מחזיר אובייקט מחסן לפי ה-ID שלו
+ * @param {string} warehouseId - ה-ID של המחסן
+ * @returns {Object} - אובייקט המחסן
+ */
+function getWarehouseById(warehouseId) {
+    if (!warehouseId) return null;
+    return db.warehouses.find(w => w.id === warehouseId);
+}

@@ -6,6 +6,7 @@ let currentPageId = 'screen-home'; // עמוד הבית הוא ברירת המח
 let currentItemElement = null; // ישמש את מודאל הסטטוס
 let activeSwipeElement = null; // ישמש למעקב אחרי פריט פתוח
 
+
 // ... (משתנים גלובליים של לוגיקת החלקה - ללא שינוי)
 let startX = 0,
     currentX = 0,
@@ -19,6 +20,7 @@ let statusModal, statusOverlay;
 let quickAddModal, quickAddOverlay;
 let resolveGapModal, resolveGapOverlay;
 let warehouseDetailsList;
+let currentActivityIdForEdit = null; // ישמש לעדכון ציוד בפעילות    
 
 
 /* =================================
@@ -259,7 +261,7 @@ function renderActivityDetails(activityId) {
         console.error("לא נמצאה פעילות עם ID:", activityId);
         return;
     }
-
+    document.getElementById('screen-activity-details').dataset.activityId = activityId;
     // 1. מצא את האלמנטים ב-DOM
     const statusTitleEl = document.getElementById('activity-status-title');
     const missingListEl = document.getElementById('activity-missing-list');
@@ -328,7 +330,80 @@ function renderActivityDetails(activityId) {
 פונקציות טפסים (חדש)
 =================================
 */
+/**
+ * מרנדר את רשימת בחירת הציוד למסך עריכת פעילות
+ */
+function renderEquipmentSelectionList() {
+    if (!currentActivityIdForEdit) {
+        console.error("לא נבחרה פעילות לעריכה");
+        return;
+    }
 
+    const activity = getActivityById(currentActivityIdForEdit);
+    if (!activity) {
+        console.error("לא נמצאה פעילות עם ID:", currentActivityIdForEdit);
+        return;
+    }
+
+    const listContainer = document.getElementById('equipment-selection-list-container');
+    listContainer.innerHTML = ""; // נקה תוכן קודם
+
+    // קבל את כל הציוד הקיים במערכת
+    const allEquipment = db.equipment;
+
+    if (allEquipment.length === 0) {
+        listContainer.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 20px;">לא נמצא ציוד במערכת.</p>`;
+        return;
+    }
+
+    allEquipment.forEach(item => {
+        const warehouse = getWarehouseById(item.warehouseId);
+        const warehouseName = warehouse ? warehouse.name : "לא משויך";
+
+        // בדוק אם הפריט כבר משויך לפעילות
+        const isChecked = activity.equipmentRequiredIds.includes(item.id);
+
+        // בדוק אם ניתן לבחור את הפריט (רק 'כשיר' או 'בטעינה' ניתנים לבחירה)
+        const isSelectable = (item.status === 'available' || item.status === 'charging');
+
+        // קבע סטטוסים ל-CSS
+        const isDisabled = !isSelectable;
+        const disabledClass = isDisabled ? 'disabled' : '';
+        const checkedAttr = isChecked ? 'checked' : '';
+        const disabledAttr = isDisabled ? 'disabled' : '';
+
+        // קבל את הסטטוס להצגה (כמו ב-generateEquipmentItemHTML)
+        const statusMap = {
+            'available': { text: 'כשיר', class: 'status-available' },
+            'charging': { text: 'בטעינה', class: 'status-charging' },
+            'broken': { text: 'לא כשיר', class: 'status-broken' },
+            'repair': { text: 'בתיקון', class: 'status-repair' },
+            'loaned': { text: 'הושאל', class: 'status-loaned' }
+        };
+        const statusInfo = statusMap[item.status] || { text: 'לא ידוע', class: 'status-grey' };
+
+        // בניית ה-HTML
+        const itemHtml = `
+            <div class="equipment-select-item ${disabledClass}" data-item-id="${item.id}">
+                <div class="equipment-item-content">
+                    <div class="equipment-details">
+                        <div class="equipment-name">${item.name}</div>
+                        <div class="equipment-secondary-info">מחסן: ${warehouseName}</div>
+                    </div>
+                    <div class="equipment-status ${statusInfo.class}">
+                        <span class="status-dot"></span>
+                        <span>${statusInfo.text}</span>
+                    </div>
+                </div>
+                <div class="equipment-select-checkbox">
+                    <input type="checkbox" id="item-select-${item.id}" ${checkedAttr} ${disabledAttr}>
+                    <label for="item-select-${item.id}"></label>
+                </div>
+            </div>
+        `;
+        listContainer.innerHTML += itemHtml;
+    });
+}
 /**
  * ממלא את תיבות הבחירה בטופס הוספת פריט
  */
@@ -839,12 +914,25 @@ function setupGlobalEventListeners() {
     const editActivityBtn = document.getElementById('edit-activity-equipment-btn');
     if (editActivityBtn) {
         editActivityBtn.onclick = () => {
-            // בשלב הבא, נצטרך להעביר לכאן את מזהה הפעילות
-            // const activityId = ...; 
-            // renderEquipmentSelectionList(activityId);
+            // 1. קרא את ה-ID של הפעילות מהאלמנט של המסך
+            const activityId = document.getElementById('screen-activity-details').dataset.activityId;
+            if (!activityId) {
+                alert("שגיאה: לא ניתן לזהות את הפעילות הנבחרת.");
+                return;
+            }
 
-            // בינתיים, רק מנווטים
-            showPage('screen-edit-activity-equipment', 'עריכת ציוד');
+            // 2. שמור אותו במשתנה הגלובלי
+            currentActivityIdForEdit = activityId;
+
+            // 3. קרא את שם הפעילות לכותרת
+            const activity = getActivityById(activityId);
+            const activityName = activity ? activity.name : "פעילות";
+
+            // 4. קרא לפונקציה שמרנדרת את הרשימה
+            renderEquipmentSelectionList();
+
+            // 5. עכשיו נווט למסך העריכה עם הכותרת הנכונה
+            showPage('screen-edit-activity-equipment', `עריכת ציוד (${activityName})`);
         };
     }
     // --- האזנה לקליקים על רשימת המחסנים ---
