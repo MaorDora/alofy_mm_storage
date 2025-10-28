@@ -617,7 +617,43 @@ function handleAddActivitySubmit(event) {
     renderActivityList(); // רענן את רשימת הפעילויות
     showPage('screen-activities-list');
 }
+/**
+ * מטפל בשמירת השינויים במסך עריכת ציוד לפעילות
+ */
+function handleSaveActivityEquipment() {
+    if (!currentActivityIdForEdit) {
+        console.error("שגיאה: אין פעילות במצב עריכה.");
+        return;
+    }
 
+    // 1. אסוף את כל ה-ID של הפריטים שסומנו
+    const selectedIds = [];
+    const checkboxes = document.querySelectorAll('#equipment-selection-list-container input[type="checkbox"]:checked');
+    checkboxes.forEach(cb => {
+        // הפריט נשמר ב-data-item-id על האלמנט האבא
+        const itemId = cb.closest('.equipment-select-item').dataset.itemId;
+        if (itemId) {
+            selectedIds.push(itemId);
+        }
+    });
+
+    // 2. קרא לפונקציית העדכון ב-database
+    // הפונקציה הזו תמיין מחדש ל"כשירים" ו"חסרים" ותשמור
+    updateActivityEquipment(currentActivityIdForEdit, selectedIds);
+
+    // 3. עדכן את ה-UI
+    alert("השינויים נשמרו בהצלחה!");
+
+    // 4. רענן את העמודים הרלוונטיים
+    renderActivityDetails(currentActivityIdForEdit); // רענן את מסך הפרטים
+    renderActivityList(); // רענן את רשימת הפעילויות (לעדכון ספירה)
+
+    // 5. נווט חזרה למסך פרטי הפעילות
+    showPage('screen-activity-details');
+
+    // 6. נקה את המשתנה הגלובלי
+    currentActivityIdForEdit = null;
+}
 
 /* =================================
 לוגיקה ספציפית (ללא שינוי)
@@ -866,7 +902,10 @@ function setupGlobalEventListeners() {
     // --- כפתור צף (ללא שינוי) ---
     const fab = document.querySelector('.fab');
     if (fab) fab.onclick = openQuickAddModal;
-
+    const saveActivityEquipmentBtn = document.getElementById('save-activity-equipment-btn');
+    if (saveActivityEquipmentBtn) {
+        saveActivityEquipmentBtn.onclick = handleSaveActivityEquipment;
+    }
     // --- מודאלים (כפתורי סגירה וביטול - ללא שינוי) ---
     if (statusOverlay) statusOverlay.onclick = closeStatusModal;
     if (quickAddOverlay) quickAddOverlay.onclick = closeQuickAddModal;
