@@ -249,7 +249,81 @@ function renderActivityList() {
     });
 }
 
+/**
+ * מרנדר את עמוד פרטי הפעילות עם נתונים מה-DB
+ * @param {string} activityId - ה-ID של הפעילות לטעינה
+ */
+function renderActivityDetails(activityId) {
+    const activity = getActivityById(activityId);
+    if (!activity) {
+        console.error("לא נמצאה פעילות עם ID:", activityId);
+        return;
+    }
 
+    // 1. מצא את האלמנטים ב-DOM
+    const statusTitleEl = document.getElementById('activity-status-title');
+    const missingListEl = document.getElementById('activity-missing-list');
+    const assignedListEl = document.getElementById('activity-assigned-list');
+
+    // 2. נקה תוכן קודם
+    missingListEl.innerHTML = "";
+    assignedListEl.innerHTML = "";
+
+    // 3. עדכן כותרת סטטוס
+    const totalRequired = activity.equipmentRequiredIds.length;
+    const totalMissing = activity.equipmentMissingIds.length;
+    const totalItems = totalRequired + totalMissing;
+    statusTitleEl.innerText = `סטטוס בד"ח (${totalRequired}/${totalItems})`;
+
+    // 4. רנדר פריטים חסרים (מהמערך equipmentMissingIds)
+    if (totalMissing > 0) {
+        activity.equipmentMissingIds.forEach(itemId => {
+            const item = getEquipmentById(itemId);
+            if (item) {
+                // קוד כדי לתרגם סטטוסים של הפריט לטקסט
+                const statusMap = {
+                    'broken': 'לא כשיר',
+                    'repair': 'בתיקון',
+                    'charging': 'בטעינה',
+                    'loaned': 'הושאל'
+                };
+                const itemStatusText = statusMap[item.status] || item.status; //
+
+                const itemHtml = `
+                    <div class="status-item missing" onclick="openResolveGapModal('${item.name}')">
+                        <span class="status-item-icon icon-red">&times;</span>
+                        <div class="status-item-details">
+                            <div class="status-item-title">${item.name} (נדרש)</div>
+                            <div class="status-item-subtitle">סטטוס נוכחי: ${itemStatusText}. לחץ לטיפול...</div>
+                        </div>
+                    </div>
+                `;
+                missingListEl.innerHTML += itemHtml;
+            }
+        });
+    }
+
+    // 5. רנדר פריטים כשירים ומשוריינים (מהמערך equipmentRequiredIds)
+    if (totalRequired === 0) {
+        assignedListEl.innerHTML = `<p style="color: var(--text-secondary); padding: 10px 0; text-align: center;">לא שוריין ציוד לפעילות זו.</p>`;
+    } else {
+        activity.equipmentRequiredIds.forEach(itemId => {
+            const item = getEquipmentById(itemId);
+            if (item) {
+                const itemHtml = `
+                    <div class="status-item assigned">
+                        <span class="status-item-icon icon-green">&#10003;</span>
+                        <div class="status-item-details">
+                            <div class="status-item-title">${item.name}</div>
+                            <div class="status-item-subtitle">(כשיר, שוריין)</div>
+                        </div>
+                    </div>
+                `;
+                assignedListEl.innerHTML += itemHtml;
+            }
+        });
+    }
+}
 /* =================================
 פונקציות טפסים (חדש)
 =================================
@@ -778,8 +852,11 @@ function setupGlobalEventListeners() {
             if (card) {
                 const activityId = card.dataset.id;
                 const activityTitle = card.dataset.title;
-                // TODO: ליצור פונקציה renderActivityDetails(activityId)
-                // renderActivityDetails(activityId); 
+
+                // --- זה החלק שנוסף ---
+                renderActivityDetails(activityId);
+                // ---------------------
+
                 showPage('screen-activity-details', activityTitle);
             }
         });

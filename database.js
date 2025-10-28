@@ -250,3 +250,12 @@ function updateEquipmentItem(equipmentId, newData) {
     console.log(`פריט ${equipmentId} עודכן בהצלחה.`);
     return true;
 }
+/**
+ * מחזיר אובייקט פעילות לפי ה-ID שלה
+ * @param {string} activityId - ה-ID של הפעילות
+ * @returns {Object} - אובייקט הפעילות
+ */
+function getActivityById(activityId) {
+    if (!activityId) return null;
+    return db.activities.find(act => act.id === activityId);
+}
