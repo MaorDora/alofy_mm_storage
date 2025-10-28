@@ -429,6 +429,37 @@ function renderEquipmentSelectionList() {
     });
 }
 /**
+ * מסנן את רשימת הציוד במסך העריכה לפי טקסט חיפוש
+ */
+function filterEquipmentList() {
+    const searchTerm = document.getElementById('equipment-search-input').value.toLowerCase();
+    const items = document.querySelectorAll('#equipment-selection-list-container .equipment-select-item');
+    const noResultsEl = document.getElementById('equipment-list-no-results');
+
+    let itemsVisible = 0;
+
+    items.forEach(item => {
+        // בדוק גם את שם הפריט וגם את המידע המשני (מחסן)
+        const name = item.querySelector('.equipment-name').innerText.toLowerCase();
+        const info = item.querySelector('.equipment-secondary-info').innerText.toLowerCase();
+
+        const isMatch = (name.includes(searchTerm) || info.includes(searchTerm));
+
+        item.classList.toggle('item-hidden', !isMatch);
+
+        if (isMatch) {
+            itemsVisible++;
+        }
+    });
+
+    // הצג הודעת "אין תוצאות" אם שום דבר לא תואם
+    if (itemsVisible === 0 && items.length > 0) {
+        noResultsEl.style.display = 'block';
+    } else {
+        noResultsEl.style.display = 'none';
+    }
+}
+/**
  * ממלא את תיבות הבחירה בטופס הוספת פריט
  */
 function populateAddItemForm() {
@@ -943,7 +974,20 @@ function setupGlobalEventListeners() {
             if (modal.id === 'resolve-gap-modal') btn.onclick = closeResolveGapModal;
         }
     });
+    // --- מאזיני חיפוש ופילטור במסך עריכת ציוד ---
+    const searchInput = document.getElementById('equipment-search-input');
+    if (searchInput) {
+        // הפעל את הפונקציה בכל פעם שהמשתמש מקליד
+        searchInput.addEventListener('input', filterEquipmentList);
+    }
 
+    const filterBtn = document.getElementById('equipment-filter-btn');
+    if (filterBtn) {
+        filterBtn.onclick = () => {
+            // TODO: להטמיע לוגיקת פילטור (דורש מודאל)
+            alert("לוגיקת פילטור תוטמע כאן בהמשך.");
+        };
+    }
     // --- כפתורי "חזור" (עודכן) ---
     document.querySelectorAll('.back-button').forEach(btn => {
         const page = btn.closest('.page');

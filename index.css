@@ -1244,3 +1244,10 @@ body {
     margin-bottom: 120px;
     /* מרווח גדול בתחתית הרשימה כדי לא להסתיר מאחורי הכפתור */
 }
+
+
+/* הוספה בסוף הקובץ */
+
+.equipment-select-item.item-hidden {
+    display: none;
+}
