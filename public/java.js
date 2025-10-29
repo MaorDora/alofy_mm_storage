@@ -845,10 +845,10 @@ function closeSwipeItem(element) {
 אתחול האפליקציה (שונה)
 =================================
 */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async() => {
 
     // **חדש**: טען את בסיס הנתונים מ-localStorage
-    loadDB();
+    await window.loadDbFromFirebase();
 
     // 1. אתחול משתני אלמנטים
     statusModal = document.getElementById('status-modal');

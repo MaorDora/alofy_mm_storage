@@ -84,7 +84,60 @@ async function uploadInitialDataToFirebase() {
         alert("אירעה שגיאה. בדוק את ה-Console (F12) לפרטים.");
     }
 }
+// =================================
+// 5.א. פונקציית טעינה חדשה מהענן!
+// =================================
+/**
+ * טוען את כל הנתונים מ-Firestore ומאכלס את window.db
+ * זו הפונקציה שתחליף את loadDB() הישנה.
+ */
+async function loadDbFromFirebase() {
+    console.log("מתחיל טעינת נתונים מ-Firestore...");
+    const firestoreDB = window.dbInstance;
+    if (!firestoreDB) {
+        console.error("טעינה נכשלה, אין חיבור ל-Firestore.");
+        return;
+    }
 
+    try {
+        // נאפס את ה-DB המקומי
+        window.db = {
+            users: [],
+            warehouses: [],
+            equipment: [],
+            activities: []
+        };
+
+        // 1. טעינת משתמשים
+        const usersSnapshot = await getDocs(collection(firestoreDB, "users"));
+        usersSnapshot.forEach(doc => {
+            window.db.users.push({ id: doc.id, ...doc.data() });
+        });
+
+        // 2. טעינת מחסנים
+        const warehousesSnapshot = await getDocs(collection(firestoreDB, "warehouses"));
+        warehousesSnapshot.forEach(doc => {
+            window.db.warehouses.push({ id: doc.id, ...doc.data() });
+        });
+
+        // 3. טעינת ציוד
+        const equipmentSnapshot = await getDocs(collection(firestoreDB, "equipment"));
+        equipmentSnapshot.forEach(doc => {
+            window.db.equipment.push({ id: doc.id, ...doc.data() });
+        });
+
+        // 4. טעינת פעילויות
+        const activitiesSnapshot = await getDocs(collection(firestoreDB, "activities"));
+        activitiesSnapshot.forEach(doc => {
+            window.db.activities.push({ id: doc.id, ...doc.data() });
+        });
+
+        console.log("טעינת נתונים מהענן הושלמה!", window.db);
+
+    } catch (error) {
+        console.error("שגיאה קריטית בטעינת נתונים מהענן:", error);
+    }
+}
 
 // =================================
 // 5. כל הפונקציות הקיימות שלך (עודכנו לעבוד עם window.db)
@@ -305,3 +358,4 @@ window.getActivityById = getActivityById;
 window.getWarehouseById = getWarehouseById;
 window.updateActivityEquipment = updateActivityEquipment;
 window.uploadInitialDataToFirebase = uploadInitialDataToFirebase;
+window.loadDbFromFirebase = loadDbFromFirebase;
