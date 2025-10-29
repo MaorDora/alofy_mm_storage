@@ -569,25 +569,28 @@ function prepareAndShowEditItemPage(item) {
 /**
  * מטפל בשליחת טופס הוספת/עריכת פריט
  */
-function handleAddItemSubmit(event) {
+/**
+ * מטפל בשליחת טופס הוספת/עריכת פריט
+ */
+async function handleAddItemSubmit(event) { // 1. הוספנו 'async'
     event.preventDefault(); // מנע שליחה רגילה
     const form = event.target;
     const editId = form.dataset.editId; // בדוק אם אנחנו במצב עריכה
 
-    // 1. קרא נתונים מהטופס
+    // 1. קרא נתונים מהטופס (ללא שינוי)
     const name = document.getElementById('item-name').value;
     const warehouseId = document.getElementById('item-warehouse-select').value;
     const managerUserId = document.getElementById('item-manager-select').value;
     const status = document.getElementById('item-status-select').value;
     const lastCheckDate = document.getElementById('item-check-date').value;
 
-    // 2. ולידציה בסיסית
+    // 2. ולידציה בסיסית (ללא שינוי)
     if (!name || !warehouseId || !managerUserId || !status || !lastCheckDate) {
         alert("אנא מלא את כל השדות.");
         return;
     }
 
-    // 3. צור אובייקט נתונים
+    // 3. צור אובייקט נתונים (ללא שינוי)
     const itemData = {
         name: name,
         managerUserId: managerUserId,
@@ -599,20 +602,18 @@ function handleAddItemSubmit(event) {
     if (editId) {
         // --- מצב עריכה ---
 
-        // 4א. קרא לפונקציית העדכון החדשה ב-database.js
-        updateEquipmentItem(editId, itemData);
-        saveDB(); // שמור שינויים
+        // 4א. קרא לפונקציית העדכון החדשה וחכה לה
+        await updateEquipmentItem(editId, itemData);
+        // saveDB(); // 5א. מחקנו את השורה הזו
 
-        // 5א. חיווי, רענון, ניווט
+        // 6א. חיווי, רענון, ניווט (ללא שינוי)
         alert("הפריט עודכן בהצלחה!");
-        form.reset(); // נקה את הטופס
-        form.dataset.editId = ""; // נקה מצב עריכה
+        form.reset();
+        form.dataset.editId = "";
 
-        // רענן את הרשימות הרלוונטיות
-        renderWarehouseList(); // רענון ספירת פריטים כללית
-        renderWarehouseDetails(itemData.warehouseId); // רענון המסך ממנו באנו
+        renderWarehouseList();
+        renderWarehouseDetails(itemData.warehouseId);
 
-        // נווט חזרה למסך פרטי המחסן
         const warehouse = db.warehouses.find(w => w.id === itemData.warehouseId);
         const warehouseTitle = warehouse ? warehouse.name : "פרטי מחסן";
         showPage('screen-warehouse-details', warehouseTitle);
@@ -621,17 +622,18 @@ function handleAddItemSubmit(event) {
         // --- מצב הוספה (הלוגיקה הקיימת) ---
 
         // 4ב. צור ID חדש והוסף שדות חסרים
-        itemData.id = 'eq-' + Date.now(); // ID ייחודי פשוט
+        itemData.id = 'eq-' + Date.now();
         itemData.loanedToUserId = null;
 
-        // 5ב. הוסף ל-DB ושמור
-        db.equipment.push(itemData);
-        saveDB();
+        // 5ב. קרא לפונקציית ההוספה החדשה וחכה לה
+        await addNewEquipment(itemData);
+        // db.equipment.push(itemData); // 6ב. מחקנו את השורה הזו
+        // saveDB(); // 6ב. מחקנו את השורה הזו
 
-        // 6ב. חיווי, רענון, ניווט
+        // 7ב. חיווי, רענון, ניווט (ללא שינוי)
         alert("פריט חדש נוסף בהצלחה!");
-        form.reset(); // נקה את הטופס
-        renderWarehouseList(); // רענן את רשימת המחסנים
+        form.reset();
+        renderWarehouseList();
         showPage('screen-warehouses-list');
     }
 }
