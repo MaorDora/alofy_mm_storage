@@ -100,14 +100,14 @@ function changeStatus(newStatusClass, newStatusText) {
         return;
     }
     const newStatus = newStatusClass.replace('status-', '');
-    updateEquipmentStatus(itemId, newStatus);
+    updateEquipmentStatus(itemId, newStatus); // זה כבר שומר ב-Firebase
 
     if (newStatus === 'loaned') {
         const item = getEquipmentById(itemId);
         // TODO: להוסיף פופאפ ששואל למי להשאיל
         item.loanedToUserId = "u-3"; // השאלה לעידו כהן לצורך הדגמה
     }
-    saveDB();
+    // saveDB(); // <--- מחקנו את השורה הזו
     const item = getEquipmentById(itemId);
     renderWarehouseDetails(item.warehouseId);
     closeStatusModal();
@@ -640,7 +640,7 @@ async function handleAddItemSubmit(event) { // 1. הוספנו 'async'
 /**
  * מטפל בשליחת טופס הוספת פעילות
  */
-function handleAddActivitySubmit(event) {
+async function handleAddActivitySubmit(event) { // 1. הוספנו 'async'
     event.preventDefault();
 
     // 1. קרא נתונים
@@ -664,9 +664,10 @@ function handleAddActivitySubmit(event) {
         equipmentMissingIds: []
     };
 
-    // 4. הוסף ל-DB ושמור
-    db.activities.push(newActivity);
-    saveDB();
+    // 4. הוסף ל-DB בענן (במקום הקוד הישן)
+    await addNewActivity(newActivity);
+    // db.activities.push(newActivity); // מחקנו
+    // saveDB(); // מחקנו
 
     // 5. חיווי, רענון, ניווט
     alert("פעילות חדשה נוספה בהצלחה!");
@@ -747,7 +748,8 @@ function filterItems(filterType, clickedChip) {
 }
 
 // --- ביצוע ווידוא (שונה) ---
-function validateItem(button) {
+// 1. הוספנו 'async'
+async function validateItem(button) {
     const itemContainer = button.closest('.swipe-container');
     const infoEl = itemContainer.querySelector('.equipment-secondary-info');
     const itemId = itemContainer.dataset.id;
@@ -755,9 +757,14 @@ function validateItem(button) {
     if (!item) return;
 
     item.lastCheckDate = new Date().toISOString().split('T')[0];
-    saveDB();
 
-    const today = new Date(item.lastCheckDate).toLocaleDateString('he-IL', {
+    // 2. קראנו לפונקציית העדכון החדשה במקום saveDB
+    // אנחנו שולחים את כל האובייקט 'item' כ-newData
+    // (בלי ה-id)
+    const { id, ...itemData } = item;
+    await updateEquipmentItem(itemId, itemData);
+
+    const today = new Date(item.lastCheckDate).toLocaleString('he-IL', {
         day: '2-digit',
         month: '2-digit',
         year: '2-digit'
