@@ -347,6 +347,29 @@ async function createNewUser(userData) {
         console.error("שגיאה בהוספת משתמש חדש לענן:", error);
     }
 }
+/**
+ * מוחק פריט ציוד (מקומי + ענן)
+ */
+async function deleteEquipmentItem(equipmentId) {
+    // 1. מחיקה מקומית (מהמטמון)
+    window.db.equipment = window.db.equipment.filter(item => item.id !== equipmentId);
+    console.log(`פריט ${equipmentId} נמחק מקומית.`);
+
+    // 2. מחיקה מהענן
+    try {
+        const docRef = doc(window.dbInstance, "equipment", equipmentId);
+        await deleteDoc(docRef);
+        console.log(`פריט ${equipmentId} נמחק מהענן.`);
+
+        // TODO: (לשלב הבא)
+        // כאן נצטרך להוסיף לוגיקה שתסיר את ה-ID הזה
+        // גם מכל מערך equipmentRequiredIds בפעילויות.
+        // כרגע נשאיר את זה פשוט.
+
+    } catch (error) {
+        console.error("שגיאה במחיקת פריט מהענן:", error);
+    }
+}
 // =================================
 // 8. ייצוא הפונקציות לחלון הגלובלי
 // =================================
@@ -371,4 +394,5 @@ window.updateEquipmentItem = updateEquipmentItem;
 window.updateActivityEquipment = updateActivityEquipment;
 window.addNewEquipment = addNewEquipment;
 window.addNewActivity = addNewActivity;
-window.createNewUser = createNewUser; // <-- הוסף את השורה הזו
+window.createNewUser = createNewUser;
+window.deleteEquipmentItem = deleteEquipmentItem;

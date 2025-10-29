@@ -756,6 +756,46 @@ function handleSaveActivityEquipment() {
     currentActivityIdForEdit = null;
 }
 /**
+ * מטפל בלחיצה על כפתור מחיקת פריט
+ */
+async function handleDeleteItem() {
+    if (!currentItemElement) {
+        console.error("לא נבחר פריט למחיקה");
+        return;
+    }
+
+    const itemId = currentItemElement.dataset.id;
+    const item = window.getEquipmentById(itemId); // פונקציה קיימת
+
+    if (!item) {
+        console.error("לא נמצא פריט למחיקה עם ID:", itemId);
+        return;
+    }
+
+    // 1. קבל אישור מהמשתמש!
+    const confirmation = confirm(`האם אתה בטוח שברצונך למחוק את "${item.name}"? \nאין דרך לשחזר פעולה זו.`);
+
+    if (confirmation) {
+        console.log(`מתחיל מחיקה של ${itemId}...`);
+
+        // 2. קרא לפונקציית המחיקה (שניצור בשלב 4)
+        await window.deleteEquipmentItem(itemId);
+
+        // 3. סגור את המודאל
+        closeStatusModal();
+
+        // 5. רנדר מחדש את הרשימות
+        renderWarehouseList();
+
+        // 6. נווט חזרה לרשימת המחסנים
+        showPage('screen-warehouses-list');
+
+        alert(`"${item.name}" נמחק בהצלחה.`);
+    } else {
+        console.log("מחיקה בוטלה.");
+    }
+}
+/**
  * מטפל בלחיצה על כפתור התחברות עם גוגל
  */
 async function handleGoogleLogin() {
@@ -1087,6 +1127,10 @@ function setupGlobalEventListeners() {
     const loginBtn = document.getElementById('google-login-btn');
     if (loginBtn) {
         loginBtn.onclick = handleGoogleLogin;
+    }
+    const deleteBtn = document.getElementById('btn-delete-item');
+    if (deleteBtn) {
+        deleteBtn.onclick = handleDeleteItem;
     }
     // --- ניווט תחתון (ללא שינוי) ---
     const navItems = document.querySelectorAll('.nav-item');

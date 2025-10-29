@@ -1199,3 +1199,31 @@ body {
 .equipment-select-item.item-hidden {
     display: none;
 }
+
+
+/* =================================
+סגנון כפתור מחיקה (חדש)
+=================================
+*/
+
+.btn-danger {
+    width: 100%;
+    padding: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--status-red);
+    /* טקסט אדום */
+    background-color: rgba(255, 59, 48, 0.15);
+    /* רקע אדום שקוף */
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-bottom: 12px;
+    /* מרווח כמו שאר הכפתורים */
+    font-family: 'Heebo', sans-serif;
+}
+
+.btn-danger:hover {
+    background-color: rgba(255, 59, 48, 0.3);
+    /* אפקט לחיצה */
+}
