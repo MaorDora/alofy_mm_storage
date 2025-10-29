@@ -25,7 +25,7 @@ async function uploadInitialDataToFirebase() {
     }
     console.log("מתחיל העלאת נתונים ראשוניים לענן...");
     alert("מתחיל בהעלאת הנתונים הראשוניים ל-Firebase. חכה להודעת 'סיום'.");
-    createInitialData();
+    //  createInitialData();
     try {
         console.log("מעלה משתמשים...");
         for (const user of window.db.users) {
@@ -295,7 +295,7 @@ async function addNewActivity(activityData) {
 // פונקציות טעינה והעלאה
 window.loadDbFromFirebase = loadDbFromFirebase;
 window.uploadInitialDataToFirebase = uploadInitialDataToFirebase;
-window.createInitialData = createInitialData; // עדיין בשימוש של upload
+//window.createInitialData = createInitialData; // עדיין בשימוש של upload
 
 // פונקציות "קריאה"
 window.getEquipmentForWarehouse = getEquipmentForWarehouse;
