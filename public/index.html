@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סימולטור מובייל מאוחד (HTML בלבד)</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="mobile-simulator">
+        <div class="mobile-screen">
+            <div id="screen-home" class="page active">
+                <div class="container">
+                    <div class="header">
+                        סקירה כללית
+                    </div>
+
+                    <div class="dashboard-card" id="attention-card">
+                        <div class="card-header">
+                            <h2 class="card-title">דורש טיפול</h2>
+                        </div>
+                        <div class="card-content">
+
+                            <div class="attention-item">
+                                <div class="attention-details">
+                                    <span class="attention-icon icon-red">!</span>
+                                    <span class="attention-text">פריטים לא כשירים</span>
+                                </div>
+                                <div class="attention-count">5 <span class="chevron">&#9664;</span></div>
+                            </div>
+
+                            <div class="attention-item">
+                                <div class="attention-details">
+                                    <span class="attention-icon icon-orange">&#9881;</span>
+                                    <span class="attention-text">פריטים בתיקון</span>
+                                </div>
+                                <div class="attention-count">2 <span class="chevron">&#9664;</span></div>
+                            </div>
+
+                            <div class="attention-item">
+                                <div class="attention-details">
+                                    <span class="attention-icon icon-orange">?</span>
+                                    <span class="attention-text">השאלות שטרם הוחזרו</span>
+                                </div>
+                                <div class="attention-count">3 <span class="chevron">&#9664;</span></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" id="upcoming-card">
+                        <div class="card-header">
+                            <h2 class="card-title">פעילויות קרובות</h2>
+                        </div>
+                        <div class="card-content">
+
+                            <div class="activity-list-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">אימון אמצעים בלשב"ייה</span>
+                                    <span class="activity-time">מחר, 08:00</span>
+                                </div>
+                                <div class="activity-status status-gaps">
+                                    <div>
+                                        <span><span>&times;</span> פערים קיימים</span>
+                                        <span class="status-subtitle">חסרים 2 סנסורים</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-list-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">שילוחים תוצאי צ'אפו</span>
+                                    <span class="activity-time">29 אוק', 09:00</span>
+                                </div>
+                                <div class="activity-status status-ready">
+                                    <span><span>&#10003;</span> מוכן ליציאה</span>
+                                </div>
+                            </div>
+
+                            <div class="activity-list-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">קידוחים תוצאי צ'אפו</span>
+                                    <span class="activity-time">30 אוק', 14:00</span>
+                                </div>
+                                <div class="activity-status status-ready">
+                                    <span><span>&#10003;</span> מוכן ליציאה</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div>(תוכן נוסף לדוגמה כדי לאפשר גלילה)</div>
+                </div>
+            </div>
+            <div id="screen-activities-list" class="page sub-page">
+                <div class="header">
+                    <h1 class="main-title">פעילויות</h1>
+                    <div class="subtitle">הפעילויות האחרונות שלך</div>
+                </div>
+
+                <div class="container">
+                    <div class="activity-card">
+                        <div class="activity-card-header">
+                            <div>
+                                <h3 class="activity-card-title">קידוחים תוצאי צ'אפו</h3>
+                                <div class="activity-card-date">נערך לאחרונה: 20 אוק', 2025, 09:00</div>
+                                <div class="activity-card-person">אחראי: יונתן כפיר</div>
+                            </div>
+                        </div>
+                        <div class="activity-card-footer">
+                            <div class="activity-card-status status-red">5/6 פריטים כשירים <span class="status-dot"></span></div>
+                            <button type="button" class="btn-action">נהל ציוד &rarr;</button>
+                        </div>
+                    </div>
+
+                    <div class="activity-card">
+                        <div class="activity-card-header">
+                            <div>
+                                <h3 class="activity-card-title">אימון אמצעים בלשב"ייה</h3>
+                                <div class="activity-card-date">נערך לאחרונה: 21 אוק', 2025, 14:00</div>
+                                <div class="activity-card-person">אחראי: אופק לוי</div>
+                            </div>
+                        </div>
+                        <div class="activity-card-footer">
+                            <div class="activity-card-status status-green">8/8 פריטים כשירים</div>
+                            <button type="button" class="btn-action">נהל ציוד &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="screen-activity-details" class="page sub-page">
+                <div class="header-nav">
+                    <span class="back-button">&larr; חזור</span>
+                    <h2 id="activity-title" class="header-title">פרטי פעילות</h2>
+                </div>
+
+                <div class="details-card">
+                    <h3 class="card-title">
+                        <span id="activity-status-title">סטטוס בד"ח (5/6)</span>
+                        <span class="edit-bdh-btn" id="edit-activity-equipment-btn" style="cursor: pointer; color: var(--action-color); font-weight: 500;">ערוך</span>
+                    </h3>
+
+                    <div class="equipment-scroll-pane">
+
+                        <div id="activity-missing-list">
+                        </div>
+
+                        <h4 class="pane-subtitle">ציוד כשיר ומשוריין</h4>
+
+                        <div id="activity-assigned-list">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-primary">בצע Check-out לציוד</button>
+                    <button type="button" class="btn btn-secondary">בצע Check-in חזרה למחסן</button>
+                </div>
+            </div>
+            <div id="screen-warehouses-list" class="page sub-page">
+                <div class="header">
+                    <h1 class="main-title">מחסנים</h1>
+                </div>
+                <div class="container">
+                    <div class="warehouse-card">
+                        <div>
+                            <h3 class="warehouse-card-title">מחסן סנסורים</h3>
+                            <div class="warehouse-card-status status-red">12/30 פריטים כשירים</div>
+                        </div>
+                        <span class="chevron">&#9664;</span>
+                    </div>
+                </div>
+            </div>
+            <div id="screen-warehouse-details" class="page sub-page">
+                <div class="header-nav">
+                    <span class="back-button">&larr; חזור</span>
+                    <h2 id="warehouse-title" class="header-title">מחסן סנסורים</h2>
+                </div>
+
+                <div class="filter-chips">
+                    <div class="chip active">הכל</div>
+                    <div class="chip">דורש ווידוא</div>
+                    <div class="chip">לא כשיר</div>
+                    <div class="chip">הושאל</div>
+                </div>
+
+                <div class="details-card">
+                    <div class="equipment-list">
+
+                        <div class="swipe-container" data-status="available" data-validate-date="2025-09-15">
+                            <div class="swipe-action-left">
+                                בצע ווידוא
+                            </div>
+                            <div class="equipment-item-content">
+                                <div class="equipment-details">
+                                    <div class="equipment-name">סנסור #101</div>
+                                    <div class="equipment-secondary-info">אחראי: מאור דורה • ווידוא: 15/09/25</div>
+                                </div>
+                                <div class="equipment-status status-available">
+                                    <span class="status-dot"></span>
+                                    <span>כשיר</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="swipe-container" data-status="loaned" data-validate-date="2025-10-20">
+                            <div class="swipe-action-left">
+                                בצע ווידוא
+                            </div>
+                            <div class="equipment-item-content">
+                                <div class="equipment-details">
+                                    <div class="equipment-name">סנסור #102</div>
+                                    <div class="equipment-secondary-info">הושאל ל: עידו כהן • עד: 29/10/25</div>
+                                </div>
+                                <div class="equipment-status status-loaned">
+                                    <span class="status-dot"></span>
+                                    <span>הושאל</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="swipe-container" data-status="broken" data-validate-date="2025-10-25">
+                            <div class="swipe-action-left">
+                                בצע ווידוא
+                            </div>
+                            <div class="equipment-item-content">
+                                <div class="equipment-details">
+                                    <div class="equipment-name">סנסור #103</div>
+                                    <div class="equipment-secondary-info">אחראי: מאור דורה • ווידוא: 25/10/25</div>
+                                </div>
+                                <div class="equipment-status status-broken">
+                                    <span class="status-dot"></span>
+                                    <span>לא כשיר</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="swipe-container" data-status="charging" data-validate-date="2025-10-27">
+                            <div class="swipe-action-left">
+                                בצע ווידוא
+                            </div>
+                            <div class="equipment-item-content">
+                                <div class="equipment-details">
+                                    <div class="equipment-name">מנד #201</div>
+                                    <div class="equipment-secondary-info">אחראי: יונתן כפיר • ווידוא: 27/10/25</div>
+                                </div>
+                                <div class="equipment-status status-charging">
+                                    <span class="status-dot"></span>
+                                    <span>בטעינה</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div id="screen-edit-item" class="page sub-page"> </div>
+            <div id="screen-add-item" class="page sub-page">
+                <div class="header-nav">
+                    <span class="back-button">&larr; חזור</span>
+                    <h2 id="add-item-title" class="header-title">הוסף פריט חדש</h2>
+                </div>
+
+                <div class="container">
+                    <form id="add-item-form" data-edit-id="">
+                        <div class="form-group">
+                            <label for="item-name">שם הפריט</label>
+                            <input type="text" id="item-name" placeholder="לדוגמה: סנסור #104" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-warehouse">שייך למחסן</label>
+                            <select id="item-warehouse-select" required>
+                    <option value="">בחר מחסן...</option>
+                </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-manager">אחראי</label>
+                            <select id="item-manager-select" required>
+                    <option value="">בחר אחראי...</option>
+                </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-status">סטטוס התחלתי</label>
+                            <select id="item-status-select" required>
+                    <option value="available">כשיר</option>
+                    <option value="charging">בטעינה</option>
+                    <option value="repair">בתיקון</option>
+                    <option value="broken">לא כשיר</option>
+                </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-check-date">תאריך ווידוא אחרון</label>
+                            <input type="date" id="item-check-date" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="add-item-submit-btn">שמור פריט</button>
+                    </form>
+                </div>
+            </div>
+            <div id="screen-add-activity" class="page sub-page">
+                <div class="header-nav">
+                    <span class="back-button">&larr; חזור</span>
+                    <h2 id="add-activity-title" class="header-title">הוסף פעילות חדשה</h2>
+                </div>
+
+                <div class="container">
+                    <form id="add-activity-form">
+                        <div class="form-group">
+                            <label for="activity-name">שם הפעילות</label>
+                            <input type="text" id="activity-name" placeholder="לדוגמה: אימון בלשב\ ייה " required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-manager">אחראי משימה</label>
+                            <select id="activity-manager-select" required>
+                    <option value="">בחר אחראי...</option>
+                </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-date">תאריך הפעילות</label>
+                            <input type="date " id="activity-date" required>
+                        </div>
+
+                        <button type="submit" id="add-item-submit-btn" class="btn btn-primary">שמור פעילות</button>
+                    </form>
+                </div>
+            </div>
+            <div id="screen-report-issue" class="page sub-page">
+            </div>
+            <div id="screen-edit-activity-equipment" class="page sub-page" style="padding-bottom: 0;">
+                <div class="header-nav">
+                    <span class="back-button">&larr; חזור</span>
+                    <h2 id="edit-activity-title" class="header-title">עריכת ציוד (טוען...)</h2>
+                </div>
+
+                <div class="container">
+                    <div class="search-filter-container">
+                        <div class="search-bar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px" style="fill: var(--text-secondary); margin-left: 8px;">
+                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                            <input type="text" id="equipment-search-input" placeholder="חיפוש ציוד...">
+                        </div>
+                        <button class="btn-filter" id="equipment-filter-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px">
+                    <path d="M3 4c0-.55.45-1 1-1h16c.55 0 1 .45 1 1s-.45 1-1 1H4c-.55 0-1-.45-1-1zM7 11c0-.55.45-1 1-1h8c.55 0 1 .45 1 1s-.45 1-1 1H8c-.55 0-1-.45-1-1zm5 7c0-.55.45-1 1-1h2c.55 0 1 .45 1 1s-.45 1-1 1h-2c-.55 0-1-.45-1-1z"/>
+                </svg>
+            </button>
+                    </div>
+                </div>
+
+                <div class="details-card" style="margin: 0 16px 20px 16px;">
+                    <div class="equipment-selection-list" id="equipment-selection-list-container">
+                        <p style="color: var(--text-secondary); text-align: center; padding: 20px;">טוען רשימת ציוד...</p>
+
+                        <p id="equipment-list-no-results" style="color: var(--text-secondary); text-align: center; padding: 20px; display: none;">לא נמצאו תוצאות</p>
+                    </div>
+                </div>
+
+                <div class="sticky-footer-btn">
+                    <button class="btn btn-primary" id="save-activity-equipment-btn">שמור שינויים</button>
+                </div>
+            </div>
+            <div class="fab">+</div>
+            <nav class="bottom-nav">
+                <div class="nav-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg> בית
+                </div>
+                <div class="nav-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58
+                                8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg> פעילויות
+                </div>
+                <div class="nav-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zM3 16.5c.83 0 1.5.67 1.5 1.5S3.83 19.5 3 19.5s-1.5-.67-1.5-1.5.67-1.5
+                                1.5-1.5zM20 6l-1.97-2H5.97L4 6H1v11h2.06c.05-.8.36-1.52.84-2.11-.8-.3-1.4-1.01-1.4-1.89 0-1.1.9-2 2-2s2 .9 2 2c0 .88-.6 1.59-1.4 1.89.48.59.79 1.31.84 2.11H17.5c.05-.8.36-1.52.84-2.11-.8-.3-1.4-1.01-1.4-1.89 0-1.1.9-2 2-2s2
+                                .9 2 2c0 .88-.6 1.59-1.4 1.89.48.59.79 1.31.84 2.11H23V6h-3zM6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM5.14 8h13.72l.96-1H4.18l.96 1z"/></svg>                    מחסן
+                </div>
+            </nav>
+            <div id="status-modal-overlay" class="modal-overlay"></div>
+            <div id="status-modal" class="modal-container">
+                <h4 id="modal-item-name" class="modal-title">שנה סטטוס עבור:</h4>
+                <div class="modal-options">
+                    <div><span class="status-dot available"></span> כשיר</div>
+                    <div><span class="status-dot charging"></span> בטעינה</div>
+                    <div><span class="status-dot loaned"></span> הושאל</div>
+                    <div><span class="status-dot repair"></span> בתיקון</div>
+                    <div><span class="status-dot broken"></span> לא כשיר</div>
+                </div>
+                <button class="btn-edit-details">ערוך פרטים</button>
+                <button class="btn-cancel">ביטול</button>
+            </div>
+            <div id="quick-add-modal-overlay" class="modal-overlay"></div>
+            <div id="quick-add-modal" class="modal-container"> </div>
+            <div id="resolve-gap-modal-overlay" class="modal-overlay"></div>
+            <div id="resolve-gap-modal" class="modal-container">
+                <h4 id="resolve-gap-title" class="modal-title">טיפול בפער: סנסור (1 חסר)</h4>
+                <div class="modal-options">
+                    <div>שבץ פריט חלופי</div>
+                    <div>הסר מהדרישה</div>
+                    <div>אשר פער והמשך</div>
+                </div>
+                <button class="btn-cancel">ביטול</button>
+            </div>
+
+        </div>
+    </div>
+    <script src="java.js"></script>
+    <script src="database.js"></script>
+</body>
+
+</html>
