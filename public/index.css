@@ -842,6 +842,7 @@ body {
 /* כפתור צף */
 
 .fab {
+    display: none;
     position: absolute;
     left: 20px;
     bottom: 100px;
@@ -864,6 +865,7 @@ body {
 /* ניווט תחתון */
 
 .bottom-nav {
+    display: none;
     position: absolute;
     bottom: 0;
     left: 0;

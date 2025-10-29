@@ -323,7 +323,30 @@ async function addNewActivity(activityData) {
     }
 }
 
+/**
+ * יוצר משתמש חדש (מקומי + ענן)
+ */
+async function createNewUser(userData) {
+    if (!userData.id) {
+        console.error("לא ניתן ליצור משתמש ללא ID");
+        return;
+    }
 
+    // 1. הוספה מקומית
+    window.db.users.push(userData);
+    console.log(`משתמש חדש ${userData.id} נוסף מקומית.`);
+
+    // 2. הוספה לענן
+    try {
+        // נשתמש ב-setDoc כדי לכפות את ה-ID שיצרנו
+        const docRef = doc(window.dbInstance, "users", userData.id);
+        const { id, ...dataToSave } = userData; // שמירת האובייקט ללא ה-ID
+        await setDoc(docRef, dataToSave);
+        console.log(`משתמש חדש ${userData.id} נוסף לענן.`);
+    } catch (error) {
+        console.error("שגיאה בהוספת משתמש חדש לענן:", error);
+    }
+}
 // =================================
 // 8. ייצוא הפונקציות לחלון הגלובלי
 // =================================
@@ -348,3 +371,4 @@ window.updateEquipmentItem = updateEquipmentItem;
 window.updateActivityEquipment = updateActivityEquipment;
 window.addNewEquipment = addNewEquipment;
 window.addNewActivity = addNewActivity;
+window.createNewUser = createNewUser; // <-- הוסף את השורה הזו

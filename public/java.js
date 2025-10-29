@@ -27,10 +27,27 @@ let currentActivityIdForEdit = null; // ישמש לעדכון ציוד בפעי�
 פונקציות ניווט (ללא שינוי)
 =================================
 */
+/* =================================
+פונקציות ניווט (משודרג)
+=================================
+*/
 function showPage(pageId, title) {
     if (pageId === currentPageId && document.getElementById(pageId).classList.contains('active')) return;
+
+    // --- בלוק חדש: ניהול נראות ניווט ---
+    const fab = document.querySelector('.fab');
+    const bottomNav = document.querySelector('.bottom-nav');
+
+    // קבע אם צריך להציג את הניווט (אל תציג רק במסך הלוגין)
+    const shouldShowNav = (pageId !== 'screen-login');
+
+    if (fab) fab.style.display = shouldShowNav ? 'flex' : 'none';
+    if (bottomNav) bottomNav.style.display = shouldShowNav ? 'flex' : 'none';
+    // --- סוף הבלוק החדש ---
+
     const currentPage = document.getElementById(currentPageId);
     const nextPage = document.getElementById(pageId);
+
     if (pageId === 'screen-warehouse-details' && title) {
         document.getElementById('warehouse-title').innerText = title;
     }
@@ -40,25 +57,13 @@ function showPage(pageId, title) {
     if (pageId === 'screen-edit-item' && title) {
         console.log("עובר לעמוד עריכה עם כותרת:", title);
     }
+
     if (currentPage) currentPage.classList.remove('active');
     if (nextPage) nextPage.classList.add('active');
+
     currentPageId = pageId;
     updateNavActive(pageId);
 }
-
-function updateNavActive(pageId) {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    let activeNavItem = null;
-    if (pageId.includes('home')) {
-        activeNavItem = document.querySelector('.nav-item:nth-child(1)');
-    } else if (pageId.includes('activities') || pageId.includes('add-activity')) {
-        activeNavItem = document.querySelector('.nav-item:nth-child(2)');
-    } else if (pageId.includes('warehouses') || pageId.includes('item') || pageId.includes('report-issue')) {
-        activeNavItem = document.querySelector('.nav-item:nth-child(3)');
-    }
-    if (activeNavItem) activeNavItem.classList.add('active');
-}
-
 
 /* =================================
 פונקציות מודאלים (ללא שינוי)
@@ -712,7 +717,33 @@ function handleSaveActivityEquipment() {
     // 6. נקה את המשתנה הגלובלי
     currentActivityIdForEdit = null;
 }
+/**
+ * מטפל בלחיצה על כפתור התחברות עם גוגל
+ */
+async function handleGoogleLogin() {
+    // אלו משתנים גלובליים שיצרנו ב-index.html
+    const provider = new window.GoogleAuthProvider();
 
+    try {
+        // פותח את הפופ-אפ של גוגל
+        const result = await window.signInWithPopup(window.authInstance, provider);
+
+        // אם ההתחברות הצליחה, onAuthStateChanged (שנגדיר עוד רגע)
+        // "יתפוס" את זה אוטומטית ויטפל בהמשך.
+
+        const user = result.user;
+        console.log("התחברות מוצלחת עם גוגל:", user.displayName);
+
+    } catch (error) {
+        // טיפול בשגיאות (למשל, אם המשתמש סגר את החלון)
+        console.error("שגיאה במהלך ההתחברות:", error.code, error.message);
+        if (error.code === 'auth/popup-closed-by-user') {
+            alert("התחברות בוטלה.");
+        } else {
+            alert("אירעה שגיאה בהתחברות. נסה שוב.");
+        }
+    }
+}
 /* =================================
 לוגיקה ספציפית (ללא שינוי)
 =================================
@@ -854,22 +885,13 @@ function closeSwipeItem(element) {
 אתחול האפליקציה (שונה)
 =================================
 */
+/* =================================
+אתחול האפליקציה (שודרג עם Auth)
+=================================
+*/
 document.addEventListener("DOMContentLoaded", async() => {
 
-    // --- זה הבלוק החדש שפותר את הבעיה ---
-    if (window.IS_LOCAL_ENV) {
-        // בסביבה מקומית: קודם נעלה את נתוני הדמה, ורק אז נטען אותם
-        console.log("טוען נתוני דמה אוטומטית ל-QAS...");
-        await window.uploadInitialDataToFirebase();
-        console.log("העלאת דמה הסתיימה. טוען נתונים מהאמולטור...");
-        await window.loadDbFromFirebase();
-    } else {
-        // בסביבת ייצור (production): פשוט נטען את הנתונים
-        await window.loadDbFromFirebase();
-    }
-    // --- סוף הבלוק החדש ---
-
-    // 1. אתחול משתני אלמנטים (הקוד המקורי שלך)
+    // 1. אתחול משתני אלמנטים (כמו קודם)
     statusModal = document.getElementById('status-modal');
     statusOverlay = document.getElementById('status-modal-overlay');
     quickAddModal = document.getElementById('quick-add-modal');
@@ -878,17 +900,8 @@ document.addEventListener("DOMContentLoaded", async() => {
     resolveGapOverlay = document.getElementById('resolve-gap-modal-overlay');
     warehouseDetailsList = document.getElementById('screen-warehouse-details');
 
-    // 2. הגדרת העמוד ההתחלתי (הקוד המקורי שלך)
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    const homePage = document.getElementById(currentPageId);
-    if (homePage) {
-        homePage.classList.add('active');
-    }
-    updateNavActive(currentPageId);
-
-    // 3. מילוי תוכן דינמי (מודאל הוספה מהירה) (הקוד המקורי שלך)
+    // 2. מילוי תוכן דינמי (מודאל הוספה מהירה) (כמו קודם)
     if (quickAddModal) {
-        // **שינינו את ה-onclick לפונקציות ההכנה החדשות**
         quickAddModal.innerHTML = `
         <div class="modal-options">
             <div onclick="prepareAndShowAddActivityPage()">
@@ -903,7 +916,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         <button class="btn-cancel" onclick="closeQuickAddModal()">ביטול</button>`;
     }
 
-    // **חדש**: הוספת מאזינים לטפסים החדשים (הקוד המקורי שלך)
+    // 3. הוספת מאזינים לטפסים (כמו קודם)
     const addItemForm = document.getElementById('add-item-form');
     if (addItemForm) {
         addItemForm.addEventListener('submit', handleAddItemSubmit);
@@ -914,7 +927,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         addActivityForm.addEventListener('submit', handleAddActivitySubmit);
     }
 
-    // 4. הוספת מאזיני אירועים (Swipe) (הקוד המקורי שלך)
+    // 4. הוספת מאזיני אירועים (Swipe) (כמו קודם)
     if (warehouseDetailsList) {
         warehouseDetailsList.addEventListener('mousedown', onSwipeStart);
         warehouseDetailsList.addEventListener('mousemove', onSwipeMove);
@@ -947,24 +960,96 @@ document.addEventListener("DOMContentLoaded", async() => {
         }, true);
     }
 
-    // 5. קישור ידני של פונקציות גלובליות לאלמנטים (הקוד המקורי שלך)
+    // 5. קישור ידני של פונקציות גלובליות לאלמנטים
     setupGlobalEventListeners();
 
-    // 6. רנדור תוכן דינמי בפעם הראשונה (הקוד המקורי שלך)
-    // עכשיו הפונקציות האלה ירוצו *אחרי* שהנתונים נטענו
-    renderWarehouseList();
-    renderActivityList();
-    // TODO: להוסיף פונקציה renderHomePage()
+    // 6. --- זה החלק החדש והחשוב ---
+    // האזנה לשינויי התחברות
+    // (אלו משתנים גלובליים שיצרנו ב-index.html)
+    window.onAuthStateChanged(window.authInstance, async(user) => {
+        if (user) {
+            // --- משתמש מחובר ---
+            console.log("משתמש מחובר:", user.email, user.uid);
 
-    console.log("אפליקציה אותחלה בהצלחה עם DB וטפסים!");
+            // --- כאן נכנסת הלוגיקה של "משתמש חדש" ---
+            // 1. נטען את ה-DB מהענן (עכשיו כשאנחנו מחוברים)
+
+            // בסביבה מקומית: קודם נעלה את נתוני הדמה, ורק אז נטען אותם
+            if (window.IS_LOCAL_ENV && !window.dbLoaded) {
+                console.log("טוען נתוני דמה אוטומטית ל-QAS...");
+                await window.uploadInitialDataToFirebase();
+                console.log("העלאת דמה הסתיימה. טוען נתונים מהאמולטור...");
+            }
+            await window.loadDbFromFirebase();
+            window.dbLoaded = true; // סיימנו לטעון
+
+            // 2. נבדוק אם המשתמש קיים אצלנו בטבלת 'users'
+            let appUser = window.getUserById(user.uid);
+
+            if (appUser) {
+                // --- משתמש ותיק ---
+                console.log("משתמש ותיק:", appUser.name);
+                // TODO: בעתיד נוכל לבדוק כאן אם appUser.isApproved === true
+
+            } else {
+                // --- משתמש חדש! ---
+                // זה המקום שבו ביקשת "להכניס פרטים כמו השם שלו"
+                console.log("משתמש חדש! יוצר רשומה ב-DB...");
+
+                const newUserData = {
+                    id: user.uid, // חשוב: ה-ID מ-Auth ומ-Firestore יהיו זהים
+                    name: user.displayName, // השם מגוגל
+                    email: user.email, // האימייל מגוגל
+                    isApproved: false // --- זה החלק שביקשת לעתיד ---
+                };
+
+                // נוסיף אותו ל-DB (פונקציה חדשה שנוסיף ל-database.js)
+                await window.createNewUser(newUserData); // נצטרך להוסיף את הפונקציה הזו
+
+                alert("ברוך הבא, " + user.displayName + "! החשבון שלך נוצר וממתין לאישור מנהל.");
+                // כרגע נכניס אותו בכל מקרה
+            }
+
+            // 3. אחרי שהכל מוכן - נרנדר את ה-UI
+            renderWarehouseList();
+            renderActivityList();
+            // TODO: להוסיף פונקציה renderHomePage()
+
+            // 4. והכי חשוב: נעביר אותו למסך הבית
+            showPage('screen-home');
+
+        } else {
+            // --- משתמש לא מחובר ---
+            console.log("משתמש לא מחובר, מציג מסך לוגין.");
+
+            // 1. נקה את ה-DB המקומי (למקרה שהיה משהו טעון)
+            window.db = { users: [], warehouses: [], equipment: [], activities: [] };
+            window.dbLoaded = false; // נאפס את הדגל
+
+            // 2. ודא שמסך הלוגין מוצג
+            showPage('screen-login');
+        }
+    });
+
+    console.log("אפליקציה אותחלה ומאזינה לשינויי התחברות.");
 });
+
 
 /**
  * פונקציית עזר שמרכזת את כל מאזיני האירועים
  * (שונתה כדי לטפל ברשימות דינמיות וכפתורי חזור חדשים)
  */
+// (הפונקציה setupGlobalEventListeners נשארת מתחת)
+/**
+ * פונקציית עזר שמרכזת את כל מאזיני האירועים
+ * (שונתה כדי לטפל ברשימות דינמיות וכפתורי חזור חדשים)
+ */
 function setupGlobalEventListeners() {
-
+    // --- הוספנו את הבלוק הזה ---
+    const loginBtn = document.getElementById('google-login-btn');
+    if (loginBtn) {
+        loginBtn.onclick = handleGoogleLogin;
+    }
     // --- ניווט תחתון (ללא שינוי) ---
     const navItems = document.querySelectorAll('.nav-item');
     if (navItems.length === 3) {
