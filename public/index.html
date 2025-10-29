@@ -417,10 +417,11 @@
 
     ``
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"; import { getFirestore, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"; const firebaseConfig = { apiKey: "AIzaSyBcNtpek7jSyN9AycVV2wW7wwDd7I8FAYA",
-        authDomain: "alofy-mm-storage.firebaseapp.com", projectId: "alofy-mm-storage", storageBucket: "alofy-mm-storage.firebasestorage.app", messagingSenderId: "223294260203", appId: "1:223294260203:web:ac133e0b962711c8c60fae", measurementId: "G-80MW6TJP3B"
-        }; const app = initializeApp(firebaseConfig); window.dbInstance = getFirestore(app); if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') { console.log("מתחבר לאמולטור המקומי (QAS)..."); connectFirestoreEmulator(window.dbInstance,
-        '127.0.0.1', 8080); } else { console.log("מתחבר לענן (Production)..."); } import './database.js'; import './java.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"; import { getFirestore, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"; import './database.js'; import './java.js';
+        const app = initializeApp(firebaseConfig); window.dbInstance = getFirestore(app); if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') { console.log("מתחבר לאמולטור המקומי (QAS)..."); connectFirestoreEmulator(window.dbInstance,'127.0.0.1',
+        8080); window.db = { users: [], warehouses: [], equipment: [], activities: [] }; console.log("טוען נתוני דמה אוטומטית ל-QAS..."); window.uploadInitialDataToFirebase(); } else { console.log("מתחבר לענן (Production)..."); }
+
+
     </script>
 </body>
 

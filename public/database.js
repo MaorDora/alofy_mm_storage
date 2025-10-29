@@ -13,6 +13,44 @@ window.db = {
     equipment: [],
     activities: []
 };
+// =================================
+// 2.1 פונקציית יצירת נתוני דמה (חדש!)
+// =================================
+function createInitialData() {
+    console.log("יוצר נתוני דמה התחלתיים...");
+
+    // אלו הנתונים שייכנסו ל-window.db
+    // ואז פונקציית ההעלאה תעלה אותם לענן
+
+    window.db.users = [
+        { id: "u-1", name: "מאור דורה" },
+        { id: "u-2", name: "יונתן כפיר" },
+        { id: "u-3", name: "עידו כהן" },
+        { id: "u-4", name: "אופק לוי" }
+    ];
+
+    window.db.warehouses = [
+        { id: "w-1", name: "מחסן סנסורים" },
+        { id: "w-2", name: "מחסן לוגיסטיקה" },
+        { id: "w-3", name: "מחסן בטריות" }
+    ];
+
+    window.db.equipment = [
+        { id: "eq-1", name: "סנסור #101", warehouseId: "w-1", managerUserId: "u-1", status: "available", lastCheckDate: "2025-10-20", loanedToUserId: null },
+        { id: "eq-2", name: "סנסור #102", warehouseId: "w-1", managerUserId: "u-1", status: "loaned", lastCheckDate: "2025-10-15", loanedToUserId: "u-3" },
+        { id: "eq-3", name: "סנסור #103", warehouseId: "w-1", managerUserId: "u-1", status: "broken", lastCheckDate: "2025-09-01", loanedToUserId: null },
+        { id: "eq-4", name: "מנד #201", warehouseId: "w-2", managerUserId: "u-2", status: "charging", lastCheckDate: "2025-10-28", loanedToUserId: null },
+        { id: "eq-5", name: "בטריה #301", warehouseId: "w-3", managerUserId: "u-2", status: "available", lastCheckDate: "2025-10-27", loanedToUserId: null }
+    ];
+
+    window.db.activities = [
+        { id: "act-1", name: 'אימון אמצעים בלשב"ייה', managerUserId: "u-4", date: "2025-10-30", equipmentRequiredIds: ["eq-1", "eq-4"], equipmentMissingIds: [] },
+        { id: "act-2", name: 'קידוחים תוצאי צ\'אפו', managerUserId: "u-2", date: "2025-11-05", equipmentRequiredIds: [], equipmentMissingIds: [] },
+        { id: "act-3", name: 'שילוחים תוצאי צ\'אפו', managerUserId: "u-1", date: "2025-11-01", equipmentRequiredIds: ["eq-5"], equipmentMissingIds: [] }
+    ];
+
+    console.log("נתוני דמה נוצרו בזיכרון.", window.db);
+}
 
 // =================================
 // 3. פונקציית העלאה (נשארת למקרה שנצטרך)
@@ -25,7 +63,7 @@ async function uploadInitialDataToFirebase() {
     }
     console.log("מתחיל העלאת נתונים ראשוניים לענן...");
     alert("מתחיל בהעלאת הנתונים הראשוניים ל-Firebase. חכה להודעת 'סיום'.");
-    //  createInitialData();
+    createInitialData();
     try {
         console.log("מעלה משתמשים...");
         for (const user of window.db.users) {

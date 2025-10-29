@@ -18,21 +18,27 @@
 =================================
 */
 
+
+/* 1. הוספנו את הבלוק הזה */
+
+html {
+    height: 100%;
+    overflow: hidden;
+    /* מונע גלילה ברמה הכי גבוהה */
+}
+
 body {
     font-family: 'Heebo', sans-serif;
     background-color: var(--bg-color);
-    /* שונה - רקע כהה */
     margin: 0;
     padding: 0;
-    min-height: 100vh;
+    /* 2. שינינו מ-min-height ל-height */
+    height: 100%;
+    /* קובע גובה 100% קשיח */
     position: relative;
     overflow: hidden;
-    /* נשאר - מונע גלילה מוזרה */
-    /* מחקנו את max-width ו- margin: auto */
+    /* נשאר - מונע גלילה ברמת ה-body */
 }
-
-
-/* עיצוב המצלמה של הסימולטור */
 
 
 /* =================================
@@ -49,7 +55,9 @@ body {
     background-color: var(--bg-color);
     transition: transform 0.3s ease-in-out;
     overflow-y: auto;
-    /* מאפשר גלילה *בתוך* העמוד */
+    /* --- הוספנו את השורה הזו --- */
+    overflow-x: hidden;
+    /* מונע גלילה אופקית בתוך העמוד */
     padding-bottom: 100px;
     /* מרווח לתפריט התחתון */
 }
