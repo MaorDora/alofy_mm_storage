@@ -356,7 +356,7 @@ function renderActivityDetails(activityId) {
     const totalAssigned = finalAssignedIds.length;
     const totalMissing = finalMissingIds.length;
     const totalItems = totalAssigned + totalMissing;
-    statusTitleEl.innerText = `סטטוס בד"ח (${totalAssigned}/${totalItems})`;
+    statusTitleEl.innerText = `סטטוס פעילות (${totalAssigned}/${totalItems})`;
 
     // 7. רנדר פריטים חסרים (finalMissingIds)
     if (totalMissing > 0) {
