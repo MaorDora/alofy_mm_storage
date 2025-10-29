@@ -31,10 +31,15 @@ let currentActivityIdForEdit = null; // ישמש לעדכון ציוד בפעי�
 פונקציות ניווט (משודרג)
 =================================
 */
+/* =================================
+פונקציות ניווט (משודרג)
+=================================
+*/
 function showPage(pageId, title) {
+    // 1. הגנה מפני לחיצות כפולות (קיים)
     if (pageId === currentPageId && document.getElementById(pageId).classList.contains('active')) return;
 
-    // --- בלוק חדש: ניהול נראות ניווט ---
+    // --- 2. בלוק ניהול נראות ניווט (קיים) ---
     const fab = document.querySelector('.fab');
     const bottomNav = document.querySelector('.bottom-nav');
 
@@ -43,11 +48,16 @@ function showPage(pageId, title) {
 
     if (fab) fab.style.display = shouldShowNav ? 'flex' : 'none';
     if (bottomNav) bottomNav.style.display = shouldShowNav ? 'flex' : 'none';
-    // --- סוף הבלוק החדש ---
+    // --- סוף הבלוק ---
 
+    // 3. מציאת העמודים (קיים)
     const currentPage = document.getElementById(currentPageId);
     const nextPage = document.getElementById(pageId);
 
+    // --- הוספנו אחיזה במסך הלוגין ---
+    const loginPage = document.getElementById('screen-login');
+
+    // 4. לוגיקת כותרות (קיים)
     if (pageId === 'screen-warehouse-details' && title) {
         document.getElementById('warehouse-title').innerText = title;
     }
@@ -58,13 +68,41 @@ function showPage(pageId, title) {
         console.log("עובר לעמוד עריכה עם כותרת:", title);
     }
 
-    if (currentPage) currentPage.classList.remove('active');
-    if (nextPage) nextPage.classList.add('active');
+    // --- 5. לוגיקת אנימציה משודרגת ---
+    if (currentPage) {
+        currentPage.classList.remove('active');
+
+        // --- התיקון ---
+        // אם העמוד שעזבנו *הרגע* הוא מסך הלוגין
+        if (currentPage.id === 'screen-login' && loginPage) {
+            // ניתן לו 300 אלפיות השנייה לסיים את אנימציית היציאה שלו,
+            // ואז נעלים אותו לגמרי מהתצוגה!
+            setTimeout(() => {
+                loginPage.style.display = 'none';
+            }, 300); // 300ms הוא זמן ה-transition ב-CSS
+        }
+        // --- סוף התיקון ---
+    }
+
+    if (nextPage) {
+        // --- הוספנו בדיקה נוספת ---
+        if (nextPage.id !== 'screen-login' && loginPage) {
+            // אם אנחנו נכנסים לעמוד שהוא *לא* לוגין,
+            // נוודא שמסך הלוגין מוסתר (ליתר ביטחון)
+            loginPage.style.display = 'none';
+        } else if (nextPage.id === 'screen-login' && loginPage) {
+            // אם אנחנו *כן* נכנסים למסך הלוגין (למשל, בהתנתקות)
+            // נוודא שהוא גלוי לפני האנימציה
+            loginPage.style.display = 'block';
+        }
+        // --- סוף הבדיקה ---
+
+        nextPage.classList.add('active');
+    }
 
     currentPageId = pageId;
     updateNavActive(pageId);
 }
-
 /* =================================
 פונקציות מודאלים (ללא שינוי)
 =================================
