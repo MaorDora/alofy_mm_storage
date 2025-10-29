@@ -1186,14 +1186,19 @@ body {
 
 /* --- 4. כפתור תחתון דביק --- */
 
+
+/* --- 4. כפתור תחתון דביק (מתוקן) --- */
+
 .sticky-footer-btn {
-    position: absolute;
-    bottom: 0;
+    position: fixed;
+    /* 1. הופך ל"קבוע" כדי שיתעלם מגלילה */
+    bottom: 80px;
+    /* 2. ממקם אותו מעל הניווט התחתון */
     left: 0;
     right: 0;
     padding: 16px;
-    padding-bottom: 30px;
-    /* התאמה לאייפון */
+    /* 3. ריפוד פנימי רגיל */
+    /* padding-bottom: 30px; <- בוטל */
     background-color: var(--card-bg-color);
     border-top: 1px solid #444;
     z-index: 50;
@@ -1203,9 +1208,18 @@ body {
     margin-top: 0;
 }
 
+
+/* 4. מוסיף ריפוד תחתון לעמוד עצמו
+   כדי שהפריט האחרון לא יסתתר מאחורי הכפתור
+*/
+
+#screen-edit-activity-equipment {
+    padding-bottom: 180px;
+}
+
 #screen-edit-activity-equipment .details-card {
-    margin-bottom: 120px;
-    /* מרווח גדול בתחתית הרשימה כדי לא להסתיר מאחורי הכפתור */
+    margin-bottom: 20px;
+    /* 5. מחזיר את המרווח הרגיל (אין צורך ב-120px) */
 }
 
 
