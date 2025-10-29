@@ -849,10 +849,20 @@ function closeSwipeItem(element) {
 */
 document.addEventListener("DOMContentLoaded", async() => {
 
-    // **חדש**: טען את בסיס הנתונים מ-localStorage
-    await window.loadDbFromFirebase();
+    // --- זה הבלוק החדש שפותר את הבעיה ---
+    if (window.IS_LOCAL_ENV) {
+        // בסביבה מקומית: קודם נעלה את נתוני הדמה, ורק אז נטען אותם
+        console.log("טוען נתוני דמה אוטומטית ל-QAS...");
+        await window.uploadInitialDataToFirebase();
+        console.log("העלאת דמה הסתיימה. טוען נתונים מהאמולטור...");
+        await window.loadDbFromFirebase();
+    } else {
+        // בסביבת ייצור (production): פשוט נטען את הנתונים
+        await window.loadDbFromFirebase();
+    }
+    // --- סוף הבלוק החדש ---
 
-    // 1. אתחול משתני אלמנטים
+    // 1. אתחול משתני אלמנטים (הקוד המקורי שלך)
     statusModal = document.getElementById('status-modal');
     statusOverlay = document.getElementById('status-modal-overlay');
     quickAddModal = document.getElementById('quick-add-modal');
@@ -861,7 +871,7 @@ document.addEventListener("DOMContentLoaded", async() => {
     resolveGapOverlay = document.getElementById('resolve-gap-modal-overlay');
     warehouseDetailsList = document.getElementById('screen-warehouse-details');
 
-    // 2. הגדרת העמוד ההתחלתי
+    // 2. הגדרת העמוד ההתחלתי (הקוד המקורי שלך)
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     const homePage = document.getElementById(currentPageId);
     if (homePage) {
@@ -869,7 +879,7 @@ document.addEventListener("DOMContentLoaded", async() => {
     }
     updateNavActive(currentPageId);
 
-    // 3. מילוי תוכן דינמי (מודאל הוספה מהירה) - **שונה**
+    // 3. מילוי תוכן דינמי (מודאל הוספה מהירה) (הקוד המקורי שלך)
     if (quickAddModal) {
         // **שינינו את ה-onclick לפונקציות ההכנה החדשות**
         quickAddModal.innerHTML = `
@@ -886,7 +896,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         <button class="btn-cancel" onclick="closeQuickAddModal()">ביטול</button>`;
     }
 
-    // **חדש**: הוספת מאזינים לטפסים החדשים
+    // **חדש**: הוספת מאזינים לטפסים החדשים (הקוד המקורי שלך)
     const addItemForm = document.getElementById('add-item-form');
     if (addItemForm) {
         addItemForm.addEventListener('submit', handleAddItemSubmit);
@@ -897,7 +907,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         addActivityForm.addEventListener('submit', handleAddActivitySubmit);
     }
 
-    // 4. הוספת מאזיני אירועים (Swipe)
+    // 4. הוספת מאזיני אירועים (Swipe) (הקוד המקורי שלך)
     if (warehouseDetailsList) {
         warehouseDetailsList.addEventListener('mousedown', onSwipeStart);
         warehouseDetailsList.addEventListener('mousemove', onSwipeMove);
@@ -930,17 +940,17 @@ document.addEventListener("DOMContentLoaded", async() => {
         }, true);
     }
 
-    // 5. קישור ידני של פונקציות גלובליות לאלמנטים
+    // 5. קישור ידני של פונקציות גלובליות לאלמנטים (הקוד המקורי שלך)
     setupGlobalEventListeners();
 
-    // 6. רנדור תוכן דינמי בפעם הראשונה
+    // 6. רנדור תוכן דינמי בפעם הראשונה (הקוד המקורי שלך)
+    // עכשיו הפונקציות האלה ירוצו *אחרי* שהנתונים נטענו
     renderWarehouseList();
     renderActivityList();
     // TODO: להוסיף פונקציה renderHomePage()
 
     console.log("אפליקציה אותחלה בהצלחה עם DB וטפסים!");
 });
-
 
 /**
  * פונקציית עזר שמרכזת את כל מאזיני האירועים
