@@ -415,8 +415,16 @@
 
         </div>
     </div>
-    <script src="java.js"></script>
-    <script src="database.js"></script>
+
+    ``
+    <script type="module">
+
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"; import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"; const firebaseConfig = { apiKey: "AIzaSyBcNtpek7jSyN9AycVV2wW7wwDd7I8FAYA",
+        authDomain: "alofy-mm-storage.firebaseapp.com", projectId: "alofy-mm-storage", storageBucket: "alofy-mm-storage.firebasestorage.app", messagingSenderId: "223294260203", appId: "1:223294260203:web:ac133e0b962711c8c60fae", measurementId: "G-80MW6TJP3B"
+        }; const app = initializeApp(firebaseConfig); window.dbInstance = getFirestore(app); import './database.js'; import './java.js';
+
+    </script>
 </body>
 
 </html>
