@@ -418,12 +418,10 @@
 
     ``
     <script type="module">
-
-
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"; import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"; const firebaseConfig = { apiKey: "AIzaSyBcNtpek7jSyN9AycVV2wW7wwDd7I8FAYA",
+        import { initializeApp } from "https.www.gstatic.com/firebasejs/9.15.0/firebase-app.js"; import { getFirestore, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"; const firebaseConfig = { apiKey: "AIzaSyBcNtpek7jSyN9AycVV2wW7wwDd7I8FAYA",
         authDomain: "alofy-mm-storage.firebaseapp.com", projectId: "alofy-mm-storage", storageBucket: "alofy-mm-storage.firebasestorage.app", messagingSenderId: "223294260203", appId: "1:223294260203:web:ac133e0b962711c8c60fae", measurementId: "G-80MW6TJP3B"
-        }; const app = initializeApp(firebaseConfig); window.dbInstance = getFirestore(app); import './database.js'; import './java.js';
-
+        }; const app = initializeApp(firebaseConfig); const db = getFirestore(app); if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") { console.log("מתחבר לאמולטור Firestore המקומי (port: 8080)"); connectFirestoreEmulator(db,
+        'localhost', 8080); } else { console.log("מתחבר ל-Firestore בענן (Live)"); } window.dbInstance = db; import './database.js'; import './java.js';
     </script>
 </body>
 

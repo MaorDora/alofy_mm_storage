@@ -1103,3 +1103,20 @@ function setupGlobalEventListeners() {
         gapOptions[2].onclick = () => alert('הפער אושר.');
     }
 }
+// --- הוסף את הבלוק הזה בסוף הקובץ ---
+
+window.showPage = showPage;
+window.openQuickAddModal = openQuickAddModal;
+window.closeQuickAddModal = closeQuickAddModal;
+window.openStatusModal = openStatusModal;
+window.closeStatusModal = closeStatusModal;
+window.changeStatus = changeStatus;
+window.editItemDetails = editItemDetails;
+window.prepareAndShowAddActivityPage = prepareAndShowAddActivityPage;
+window.prepareAndShowAddItemPage = prepareAndShowAddItemPage;
+window.openResolveGapModal = openResolveGapModal;
+window.closeResolveGapModal = closeResolveGapModal;
+window.filterItems = filterItems;
+window.handleSaveActivityEquipment = handleSaveActivityEquipment;
+window.filterEquipmentList = filterEquipmentList;
+window.validateItem = validateItem; // הוספתי גם את זה
