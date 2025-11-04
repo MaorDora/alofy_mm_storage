@@ -1,5 +1,6 @@
 {
     "hosting": {
+        "site": "alofy-mm-storage",
         "public": "public",
         "ignore": [
             "firebase.json",
