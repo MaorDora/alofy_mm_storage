@@ -19,6 +19,8 @@ let startX = 0,
 let statusModal, statusOverlay;
 let quickAddModal, quickAddOverlay;
 let resolveGapModal, resolveGapOverlay;
+let activityOptionsModal, activityOptionsOverlay;
+let currentActivityForEdit = null;
 let warehouseDetailsList;
 let currentActivityIdForEdit = null; // ישמש לעדכון ציוד בפעילות    
 
@@ -180,6 +182,27 @@ function closeResolveGapModal() {
     resolveGapOverlay.classList.remove('active');
 }
 
+
+/**
+ * פותח את מודאל אפשרויות הפעילות
+ */
+function openActivityOptionsModal(activityId, activityName) {
+    currentActivityForEdit = getActivityById(activityId);
+    if (!currentActivityForEdit) return;
+
+    document.getElementById('activity-modal-name').innerText = 'אפשרויות עבור: ' + activityName;
+    activityOptionsModal.classList.add('active');
+    activityOptionsOverlay.classList.add('active');
+}
+
+/**
+ * סוגר את מודאל אפשרויות הפעילות
+ */
+function closeActivityOptionsModal() {
+    activityOptionsModal.classList.remove('active');
+    activityOptionsOverlay.classList.remove('active');
+    currentActivityForEdit = null;
+}
 
 /* =================================
 פונקציות רינדור (ללא שינוי)
@@ -558,7 +581,30 @@ function prepareAndShowAddItemPage() {
     showPage('screen-add-item', 'הוסף פריט חדש');
 }
 // --- פונקציות מעטפת להכנה והצגה ---
+/**
+ * מכין ומציג את עמוד הוספת הפעילות במצב "עריכה"
+ * @param {Object} activity - אובייקט הפעילות לעריכה
+ */
+function prepareAndShowEditActivityPage(activity) {
+    // 1. אכלס את רשימת האחראים
+    populateAddActivityForm();
 
+    // 2. מילוי שדות הטופס עם המידע הקיים
+    document.getElementById('activity-name').value = activity.name;
+    document.getElementById('activity-manager-select').value = activity.managerUserId;
+    document.getElementById('activity-date').value = activity.date;
+
+    // 3. הגדרת מצב "עריכה"
+    document.getElementById('add-activity-form').dataset.editId = activity.id;
+
+    // 4. שינוי כותרת וכפתור
+    document.getElementById('add-activity-title').innerText = 'עריכת פעילות';
+    document.getElementById('add-item-submit-btn').innerText = 'עדכן פעילות';
+
+    // 5. הצגת העמוד
+    closeActivityOptionsModal();
+    showPage('screen-add-activity', 'עריכת פעילות: ' + activity.name);
+}
 /**
  * מכין ומציג את עמוד הוספת הפעילות
  */
@@ -683,8 +729,11 @@ async function handleAddItemSubmit(event) { // 1. הוספנו 'async'
 /**
  * מטפל בשליחת טופס הוספת פעילות
  */
-async function handleAddActivitySubmit(event) { // 1. הוספנו 'async'
+async function handleAddActivitySubmit(event) {
     event.preventDefault();
+
+    const form = event.target;
+    const editId = form.dataset.editId; // בדוק אם אנחנו במצב עריכה
 
     // 1. קרא נתונים
     const name = document.getElementById('activity-name').value;
@@ -697,26 +746,70 @@ async function handleAddActivitySubmit(event) { // 1. הוספנו 'async'
         return;
     }
 
-    // 3. צור אובייקט
-    const newActivity = {
-        id: 'act-' + Date.now(),
+    // 3. צור אובייקט הנתונים
+    const activityData = {
         name: name,
         managerUserId: managerUserId,
         date: date,
-        equipmentRequiredIds: [], // מתחיל ריק, אפשר להוסיף לוגיקה לבחירה
-        equipmentMissingIds: []
     };
 
-    // 4. הוסף ל-DB בענן (במקום הקוד הישן)
-    await addNewActivity(newActivity);
-    // db.activities.push(newActivity); // מחקנו
-    // saveDB(); // מחקנו
+    if (editId) {
+        // --- מצב עריכה ---
+        await window.updateActivity(editId, activityData);
+        alert("הפעילות עודכנה בהצלחה!");
 
-    // 5. חיווי, רענון, ניווט
-    alert("פעילות חדשה נוספה בהצלחה!");
-    event.target.reset();
-    renderActivityList(); // רענן את רשימת הפעילויות
-    showPage('screen-activities-list');
+        // נקה מצב עריכה
+        form.dataset.editId = "";
+
+        // רענן את רשימת הפעילויות ונווט חזרה לפרטי הפעילות
+        renderActivityList();
+        renderActivityDetails(editId);
+        showPage('screen-activity-details', name);
+
+    } else {
+        // --- מצב הוספה ---
+        const newActivity = {
+            id: 'act-' + Date.now(),
+            ...activityData,
+            equipmentRequiredIds: [],
+            equipmentMissingIds: []
+        };
+
+        await window.addNewActivity(newActivity);
+        alert("פעילות חדשה נוספה בהצלחה!");
+        form.reset(); // נקה את הטופס
+        renderActivityList();
+        showPage('screen-activities-list');
+    }
+}
+/**
+ * מטפל בלחיצה על כפתור מחיקת פעילות
+ */
+async function handleDeleteActivity() {
+    if (!currentActivityForEdit) return;
+
+    const activity = currentActivityForEdit;
+
+    // 1. קבל אישור מהמשתמש!
+    const confirmation = confirm(`האם אתה בטוח שברצונך למחוק את הפעילות "${activity.name}"? \nאין דרך לשחזר פעולה זו.`);
+
+    if (confirmation) {
+        console.log(`מתחיל מחיקה של פעילות ${activity.id}...`);
+
+        // 2. קרא לפונקציית המחיקה החדשה
+        await window.deleteActivity(activity.id);
+
+        // 3. סגור את המודאל
+        closeActivityOptionsModal();
+
+        // 4. רענן את רשימת הפעילויות ונווט
+        renderActivityList();
+        showPage('screen-activities-list');
+
+        alert(`הפעילות "${activity.name}" נמחקה בהצלחה.`);
+    } else {
+        console.log("מחיקה בוטלה.");
+    }
 }
 /**
  * מטפל בשמירת השינויים במסך עריכת ציוד לפעילות
@@ -976,6 +1069,8 @@ document.addEventListener("DOMContentLoaded", async() => {
     quickAddOverlay = document.getElementById('quick-add-modal-overlay');
     resolveGapModal = document.getElementById('resolve-gap-modal');
     resolveGapOverlay = document.getElementById('resolve-gap-modal-overlay');
+    activityOptionsModal = document.getElementById('activity-options-modal');
+    activityOptionsOverlay = document.getElementById('activity-options-modal-overlay');
     warehouseDetailsList = document.getElementById('screen-warehouse-details');
 
     // 2. מילוי תוכן דינמי (מודאל הוספה מהירה) (כמו קודם)
@@ -1117,7 +1212,7 @@ document.addEventListener("DOMContentLoaded", async() => {
  * פונקציית עזר שמרכזת את כל מאזיני האירועים
  * (שונתה כדי לטפל ברשימות דינמיות וכפתורי חזור חדשים)
  */
-// (הפונקציה setupGlobalEventListeners נשארת מתחת)
+// (הפונקציה  נשארת מתחת)
 /**
  * פונקציית עזר שמרכזת את כל מאזיני האירועים
  * (שונתה כדי לטפל ברשימות דינמיות וכפתורי חזור חדשים)
@@ -1151,6 +1246,7 @@ function setupGlobalEventListeners() {
     if (statusOverlay) statusOverlay.onclick = closeStatusModal;
     if (quickAddOverlay) quickAddOverlay.onclick = closeQuickAddModal;
     if (resolveGapOverlay) resolveGapOverlay.onclick = closeResolveGapModal;
+    if (activityOptionsOverlay) activityOptionsOverlay.onclick = closeActivityOptionsModal;
     const cancelButtons = document.querySelectorAll('.btn-cancel');
     cancelButtons.forEach(btn => {
         const modal = btn.closest('.modal-container');
@@ -1158,6 +1254,7 @@ function setupGlobalEventListeners() {
             if (modal.id === 'status-modal') btn.onclick = closeStatusModal;
             if (modal.id === 'quick-add-modal') btn.onclick = closeQuickAddModal;
             if (modal.id === 'resolve-gap-modal') btn.onclick = closeResolveGapModal;
+            if (modal.id === 'activity-options-modal') btn.onclick = closeActivityOptionsModal;
         }
     });
     // --- מאזיני חיפוש ופילטור במסך עריכת ציוד ---
@@ -1174,6 +1271,32 @@ function setupGlobalEventListeners() {
             alert("לוגיקת פילטור תוטמע כאן בהמשך.");
         };
     }
+    // --- ניהול פעילות (3 נקודות, עריכה, מחיקה) ---
+    const activityOptionsIcon = document.getElementById('activity-options-icon');
+    if (activityOptionsIcon) {
+        activityOptionsIcon.onclick = () => {
+            const activityId = document.getElementById('screen-activity-details').dataset.activityId;
+            const activityTitle = document.getElementById('activity-title').innerText;
+            if (activityId && activityTitle) {
+                openActivityOptionsModal(activityId, activityTitle);
+            }
+        };
+    }
+
+    const activityEditOption = document.getElementById('activity-edit-option');
+    if (activityEditOption) {
+        activityEditOption.onclick = () => {
+            if (currentActivityForEdit) {
+                prepareAndShowEditActivityPage(currentActivityForEdit);
+            }
+        };
+    }
+
+    const activityDeleteOption = document.getElementById('activity-delete-option');
+    if (activityDeleteOption) {
+        activityDeleteOption.onclick = handleDeleteActivity;
+    }
+    // ---------------------------------------------
     // --- כפתורי "חזור" (עודכן) ---
     document.querySelectorAll('.back-button').forEach(btn => {
         const page = btn.closest('.page');
@@ -1302,7 +1425,9 @@ window.prepareAndShowAddActivityPage = prepareAndShowAddActivityPage;
 window.prepareAndShowAddItemPage = prepareAndShowAddItemPage;
 window.openResolveGapModal = openResolveGapModal;
 window.closeResolveGapModal = closeResolveGapModal;
+window.openActivityOptionsModal = openActivityOptionsModal;
+window.closeActivityOptionsModal = closeActivityOptionsModal;
 window.filterItems = filterItems;
 window.handleSaveActivityEquipment = handleSaveActivityEquipment;
 window.filterEquipmentList = filterEquipmentList;
-window.validateItem = validateItem; // הוספתי גם את זה
+window.validateItem = validateItem;

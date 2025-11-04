@@ -370,6 +370,57 @@ async function deleteEquipmentItem(equipmentId) {
         console.error("שגיאה במחיקת פריט מהענן:", error);
     }
 }
+// ... אחרי הפונקציה deleteEquipmentItem(equipmentId)
+
+/**
+ * מעדכן פרטי פעילות קיימת (מקומי + ענן)
+ */
+async function updateActivity(activityId, newData) {
+    const activity = getActivityById(activityId);
+    if (!activity) {
+        console.error(`לא נמצאה פעילות לעדכון עם ID: ${activityId}`);
+        return false;
+    }
+
+    // 1. עדכון מקומי
+    Object.assign(activity, newData);
+    console.log(`פעילות מקומית ${activityId} עודכנה.`);
+
+    // 2. עדכון בענן
+    try {
+        const docRef = doc(window.dbInstance, "activities", activityId);
+        // נשתמש רק בנתונים שקיבלנו לטובת העדכון ב-Firestore
+        await updateDoc(docRef, newData);
+        console.log(`פעילות ענן ${activityId} עודכנה בהצלחה.`);
+        return true;
+    } catch (error) {
+        console.error("שגיאה בעדכון פעילות בענן:", error);
+        return false;
+    }
+}
+
+/**
+ * מוחק פעילות (מקומי + ענן)
+ */
+async function deleteActivity(activityId) {
+    // 1. מחיקה מקומית (מהמטמון)
+    window.db.activities = window.db.activities.filter(act => act.id !== activityId);
+    console.log(`פעילות ${activityId} נמחקה מקומית.`);
+
+    // 2. מחיקה מהענן
+    try {
+        const docRef = doc(window.dbInstance, "activities", activityId);
+        await deleteDoc(docRef);
+        console.log(`פעילות ${activityId} נמחקה מהענן.`);
+    } catch (error) {
+        console.error("שגיאה במחיקת פעילות מהענן:", error);
+    }
+}
+
+// =================================
+// 8. ייצוא הפונקציות לחלון הגלובלי
+// =================================
+// ...
 // =================================
 // 8. ייצוא הפונקציות לחלון הגלובלי
 // =================================
@@ -396,3 +447,5 @@ window.addNewEquipment = addNewEquipment;
 window.addNewActivity = addNewActivity;
 window.createNewUser = createNewUser;
 window.deleteEquipmentItem = deleteEquipmentItem;
+window.updateActivity = updateActivity;
+window.deleteActivity = deleteActivity;

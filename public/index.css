@@ -138,6 +138,32 @@ body {
 }
 
 
+/* ... אחרי הכלל של .header-title */
+
+
+/* --- מיקום אייקון האפשרויות במסך פרטי פעילות (חדש!) --- */
+
+#activity-options-icon {
+    /* מיקום אבסולוטי ביחס ל-header-nav */
+    position: absolute;
+    /* מזיז את הכפתור לצד שמאל (ב-RTL) */
+    left: 16px;
+    /* ממקם מעט למטה מהראש כדי לשמור על מרווח נשימה */
+    top: 40px;
+    /* שטח לחיצה גדול יותר */
+    padding: 10px;
+    /* מוודא שהוא מעל כל אלמנט אחר */
+    z-index: 20;
+    cursor: pointer;
+}
+
+#activity-options-icon svg {
+    fill: var(--text-primary);
+    display: block;
+    /* כדי להסיר רווחים מיותרים */
+}
+
+
 /* סתם כותב משהו אני לא יודע מה אני כותב פה */
 
 .back-button {
