@@ -163,6 +163,20 @@ body {
     /* כדי להסיר רווחים מיותרים */
 }
 
+#warehouse-options-icon {
+    position: absolute;
+    left: 16px;
+    top: 40px;
+    padding: 10px;
+    z-index: 20;
+    cursor: pointer;
+}
+
+#warehouse-options-icon svg {
+    fill: var(--text-primary);
+    display: block;
+}
+
 
 /* סתם כותב משהו אני לא יודע מה אני כותב פה */
 
