@@ -1211,6 +1211,18 @@ document.addEventListener("DOMContentLoaded", async() => {
                 openStatusModal(container, name, status, itemId);
             }
         }, true);
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker נרשם בהצלחה:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.error('רישום Service Worker נכשל:', err);
+                    });
+            });
+        }
+        console.log("אפליקציה אותחלה ומאזינה לשינויי התחברות.");
     }
 
     // 5. קישור ידני של פונקציות גלובליות לאלמנטים
