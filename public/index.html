@@ -447,6 +447,19 @@
         </div>
         <button class="btn-cancel" id="activity-modal-cancel">ביטול</button>
     </div>
+    <div id="warehouse-options-modal-overlay" class="modal-overlay"></div>
+    <div id="warehouse-options-modal" class="modal-container">
+        <h4 id="warehouse-modal-name" class="modal-title">אפשרויות עבור:</h4>
+        <div class="modal-options">
+            <div id="warehouse-edit-option">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>                שנה שם מחסן
+            </div>
+            <div id="warehouse-delete-option" style="color: var(--status-red);">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px" style="fill: var(--status-red);"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.12-2.12zM15.5 4l-.71-.71C14.12 3.12 13.88 3 13.5 3h-3c-.38 0-.71.12-.99.34L8.5 4H6v2h12V4z"/></svg>                מחק מחסן
+            </div>
+        </div>
+        <button class="btn-cancel" id="warehouse-modal-cancel">ביטול</button>
+    </div>
     <div id="resolve-gap-modal-overlay" class="modal-overlay"></div>
     <div id="resolve-gap-modal" class="modal-container">
         <h4 id="resolve-gap-title" class="modal-title">טיפול בפער: סנסור (1 חסר)</h4>

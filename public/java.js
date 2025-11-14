@@ -5,7 +5,9 @@
 let currentPageId = 'screen-home'; // עמוד הבית הוא ברירת המחדל
 let currentItemElement = null; // ישמש את מודאל הסטטוס
 let activeSwipeElement = null; // ישמש למעקב אחרי פריט פתוח
-
+// ... (אחרי המשתנים של activityOptionsModal)
+let warehouseOptionsModal, warehouseOptionsOverlay;
+let currentWarehouseForEdit = null;
 
 // ... (משתנים גלובליים של לוגיקת החלקה - ללא שינוי)
 let startX = 0,
@@ -849,6 +851,65 @@ function handleSaveActivityEquipment() {
     currentActivityIdForEdit = null;
 }
 /**
+ * מטפל בלחיצה על "ערוך שם מחסן"
+ */
+async function handleEditWarehouseName() {
+    if (!currentWarehouseForEdit) return;
+
+    const currentName = currentWarehouseForEdit.name;
+    const newName = prompt("הכנס שם חדש עבור המחסן:", currentName);
+
+    if (newName && newName.trim() !== "" && newName !== currentName) {
+        // הנתונים לעדכון (כרגע רק שם)
+        const updateData = { name: newName };
+
+        // קרא לפונקציה מ-database.js
+        await window.updateWarehouse(currentWarehouseForEdit.id, updateData);
+
+        // עדכן UI
+        alert("שם המחסן עודכן בהצלחה!");
+        document.getElementById('warehouse-title').innerText = newName; // עדכן כותרת
+        renderWarehouseList(); // רענן את רשימת המחסנים (שם הכרטיס ישתנה)
+        closeWarehouseOptionsModal();
+
+    } else {
+        // המשתמש לחץ "ביטול" או לא שינה את השם
+        closeWarehouseOptionsModal();
+    }
+}
+async function handleDeleteWarehouse() {
+    if (!currentWarehouseForEdit) return;
+
+    const warehouse = currentWarehouseForEdit; // למען הבהירות
+
+    // 1. האזהרה והאישור שביקשת
+    const confirmation = confirm(
+        `האם אתה בטוח שברצונך למחוק את המחסן "${warehouse.name}"?\n\n` +
+        `אזהרה: פעולה זו תמחק גם את *כל הפריטים* המשויכים למחסן זה.\n` +
+        `אין דרך לשחזר פעולה זו.`
+    );
+
+    if (confirmation) {
+        console.log(`מתחיל מחיקה של מחסן ${warehouse.id}...`);
+
+        // 2. קרא לפונקציה החדשה מ-database.js
+        await window.deleteWarehouseAndContents(warehouse.id);
+
+        // 3. סגור מודאל ונווט
+        closeWarehouseOptionsModal();
+        alert(`המחסן "${warehouse.name}" וכל תכולתו נמחקו בהצלחה.`);
+
+        // 4. עדכן UI
+        renderWarehouseList(); // רענן את הרשימה (המחסן יעלם)
+        showPage('screen-warehouses-list'); // קח את המשתמש אחורה
+
+    } else {
+        // המשתמש לחץ "ביטול"
+        console.log("מחיקת מחסן בוטלה.");
+        closeWarehouseOptionsModal();
+    }
+}
+/**
  * מטפל בלחיצה על כפתור מחיקת פריט
  */
 async function handleDeleteItem() {
@@ -987,7 +1048,25 @@ async function validateItem(button) {
 
     closeSwipeItem(content);
 }
+/**
+ * פותח את מודאל אפשרויות המחסן
+ */
+function openWarehouseOptionsModal(warehouseName) {
+    if (!currentWarehouseForEdit) return;
 
+    document.getElementById('warehouse-modal-name').innerText = 'אפשרויות עבור: ' + warehouseName;
+    warehouseOptionsModal.classList.add('active');
+    warehouseOptionsOverlay.classList.add('active');
+}
+
+/**
+ * סוגר את מודאל אפשרויות המחסן
+ */
+function closeWarehouseOptionsModal() {
+    warehouseOptionsModal.classList.remove('active');
+    warehouseOptionsOverlay.classList.remove('active');
+    currentWarehouseForEdit = null; // נקה את המחסן הנוכחי
+}
 // --- לוגיקת החלקה (Swipe) (ללא שינוי) ---
 function onSwipeStart(e) {
     targetElement = e.target.closest('.equipment-item-content');
@@ -1072,7 +1151,8 @@ document.addEventListener("DOMContentLoaded", async() => {
     activityOptionsModal = document.getElementById('activity-options-modal');
     activityOptionsOverlay = document.getElementById('activity-options-modal-overlay');
     warehouseDetailsList = document.getElementById('screen-warehouse-details');
-
+    warehouseOptionsModal = document.getElementById('warehouse-options-modal');
+    warehouseOptionsOverlay = document.getElementById('warehouse-options-modal-overlay');
     // 2. מילוי תוכן דינמי (מודאל הוספה מהירה) (כמו קודם)
     if (quickAddModal) {
         quickAddModal.innerHTML = `
@@ -1234,7 +1314,14 @@ function setupGlobalEventListeners() {
         navItems[1].onclick = () => showPage('screen-activities-list');
         navItems[2].onclick = () => showPage('screen-warehouses-list');
     }
-
+    const warehouseEditOption = document.getElementById('warehouse-edit-option');
+    if (warehouseEditOption) {
+        warehouseEditOption.onclick = handleEditWarehouseName;
+    }
+    const warehouseDeleteOption = document.getElementById('warehouse-delete-option');
+    if (warehouseDeleteOption) {
+        warehouseDeleteOption.onclick = handleDeleteWarehouse;
+    }
     // --- כפתור צף (ללא שינוי) ---
     const fab = document.querySelector('.fab');
     if (fab) fab.onclick = openQuickAddModal;
@@ -1242,6 +1329,10 @@ function setupGlobalEventListeners() {
     if (saveActivityEquipmentBtn) {
         saveActivityEquipmentBtn.onclick = handleSaveActivityEquipment;
     }
+
+    if (warehouseOptionsOverlay) warehouseOptionsOverlay.onclick = closeWarehouseOptionsModal;
+    const warehouseCancelButton = document.getElementById('warehouse-modal-cancel');
+    if (warehouseCancelButton) warehouseCancelButton.onclick = closeWarehouseOptionsModal;
     // --- מודאלים (כפתורי סגירה וביטול - ללא שינוי) ---
     if (statusOverlay) statusOverlay.onclick = closeStatusModal;
     if (quickAddOverlay) quickAddOverlay.onclick = closeQuickAddModal;
@@ -1283,6 +1374,21 @@ function setupGlobalEventListeners() {
         };
     }
 
+    const warehouseOptionsIcon = document.getElementById('warehouse-options-icon');
+    if (warehouseOptionsIcon) {
+        warehouseOptionsIcon.onclick = () => {
+            // קורא את ה-ID ש"שתלנו" על המסך
+            const warehouseId = document.getElementById('screen-warehouse-details').dataset.warehouseId;
+            const warehouse = window.getWarehouseById(warehouseId); // פונקציה מ-database.js
+
+            if (warehouse) {
+                currentWarehouseForEdit = warehouse; // שמור את המחסן לעריכה
+                openWarehouseOptionsModal(warehouse.name);
+            } else {
+                console.error("לא נמצא מחסן עם ID:", warehouseId);
+            }
+        };
+    }
     const activityEditOption = document.getElementById('activity-edit-option');
     if (activityEditOption) {
         activityEditOption.onclick = () => {
@@ -1359,6 +1465,7 @@ function setupGlobalEventListeners() {
             if (card) {
                 const warehouseId = card.dataset.id;
                 const warehouseTitle = card.dataset.title;
+                document.getElementById('screen-warehouse-details').dataset.warehouseId = warehouseId;
                 renderWarehouseDetails(warehouseId);
                 showPage('screen-warehouse-details', warehouseTitle);
             }

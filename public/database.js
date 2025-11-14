@@ -270,7 +270,28 @@ async function updateActivityEquipment(activityId, newEquipmentIds) {
         console.error("שגיאה בעדכון פעילות בענן:", error);
     }
 }
+async function updateWarehouse(warehouseId, newData) {
+    const warehouse = getWarehouseById(warehouseId);
+    if (!warehouse) {
+        console.error(`לא נמצא מחסן לעדכון עם ID: ${warehouseId}`);
+        return false;
+    }
 
+    // 1. עדכון מקומי
+    Object.assign(warehouse, newData); // מעדכן את השדות הרלוונטיים (למשל 'name')
+    console.log(`מחסן מקומי ${warehouseId} עודכן.`);
+
+    // 2. עדכון בענן
+    try {
+        const docRef = doc(window.dbInstance, "warehouses", warehouseId);
+        await updateDoc(docRef, newData);
+        console.log(`מחסן ענן ${warehouseId} עודכן בהצלחה.`);
+        return true;
+    } catch (error) {
+        console.error("שגיאה בעדכון מחסן בענן:", error);
+        return false;
+    }
+}
 // =================================
 // 7. פונקציות "יצירה" חדשות (!!! חדש !!!)
 // =================================
@@ -416,7 +437,42 @@ async function deleteActivity(activityId) {
         console.error("שגיאה במחיקת פעילות מהענן:", error);
     }
 }
+async function deleteWarehouseAndContents(warehouseId) {
+    console.log(`מתחיל מחיקת מחסן ${warehouseId} וכל תכולתו...`);
 
+    // 1. זיהוי הפריטים למחיקה (מהמטמון המקומי)
+    const itemsToDelete = window.db.equipment.filter(item => item.warehouseId === warehouseId);
+
+    // 2. מחיקה מהענן (קודם הפריטים, אחר כך המחסן)
+    try {
+        // 2א. מחיקת כל הפריטים
+        // (בפרויקט אמיתי גדול היינו משתמשים ב-Batch Write, פה לולאה תספיק)
+        for (const item of itemsToDelete) {
+            const itemDocRef = doc(window.dbInstance, "equipment", item.id);
+            await deleteDoc(itemDocRef);
+            console.log(`פריט ${item.id} נמחק מהענן.`);
+        }
+
+        // 2ב. מחיקת המחסן
+        const warehouseDocRef = doc(window.dbInstance, "warehouses", warehouseId);
+        await deleteDoc(warehouseDocRef);
+        console.log(`מחסן ${warehouseId} נמחק מהענן.`);
+
+    } catch (error) {
+        console.error("שגיאה קריטית במחיקת מחסן ותכולתו:", error);
+        alert("אירעה שגיאה במחיקה. ייתכן שהנתונים אינם מעודכנים.");
+        return; // עצור כאן אם המחיקה בענן נכשלה
+    }
+
+    // 3. עדכון המטמון המקומי (רק אם המחיקה בענן הצליחה)
+    window.db.equipment = window.db.equipment.filter(item => item.warehouseId !== warehouseId);
+    window.db.warehouses = window.db.warehouses.filter(w => w.id !== warehouseId);
+    console.log("מחיקה מקומית הושלמה.");
+
+    // TODO: (לשקול בעתיד)
+    // כרגע לא טיפלנו בפריטים שהיו משויכים לפעילויות.
+    // פונקציית renderActivityDetails תפסיק להציג אותם אוטומטית כי getEquipmentById יחזיר null.
+}
 // =================================
 // 8. ייצוא הפונקציות לחלון הגלובלי
 // =================================
@@ -449,3 +505,5 @@ window.createNewUser = createNewUser;
 window.deleteEquipmentItem = deleteEquipmentItem;
 window.updateActivity = updateActivity;
 window.deleteActivity = deleteActivity;
+window.updateWarehouse = updateWarehouse;
+window.deleteWarehouseAndContents = deleteWarehouseAndContents;
