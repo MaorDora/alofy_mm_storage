@@ -18,9 +18,6 @@
 =================================
 */
 
-
-/* 1. הוספנו את הבלוק הזה */
-
 html {
     height: 100%;
     overflow: hidden;
@@ -30,14 +27,13 @@ html {
 body {
     font-family: 'Heebo', sans-serif;
     background-color: var(--bg-color);
+    color: var(--text-primary);
+    /* הבטחת צבע טקסט ברירת מחדל */
     margin: 0;
     padding: 0;
-    /* 2. שינינו מ-min-height ל-height */
     height: 100%;
-    /* קובע גובה 100% קשיח */
     position: relative;
     overflow: hidden;
-    /* נשאר - מונע גלילה ברמת ה-body */
 }
 
 
@@ -53,13 +49,12 @@ body {
     right: 0;
     bottom: 0;
     background-color: var(--bg-color);
-    transition: transform 0.3s ease-in-out;
+    /* שינוי קל באנימציה לתחושה מהירה יותר */
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     overflow-y: auto;
-    /* --- הוספנו את השורה הזו --- */
     overflow-x: hidden;
-    /* מונע גלילה אופקית בתוך העמוד */
-    padding-bottom: 100px;
-    /* מרווח לתפריט התחתון */
+    /* הגדלת הריפוד התחתון כדי לפצות על ה-nav החדש */
+    padding-bottom: 120px;
 }
 
 
@@ -112,13 +107,16 @@ body {
 /* כותרת ראשית (כמו בעמוד הבית או רשימת מחסנים) */
 
 .header {
-    padding: 40px 16px 20px 16px;
+    /* הוספת ריפוד עליון בטוח (עבור Notch) */
+    padding: calc(40px + env(safe-area-inset-top)) 16px 20px 16px;
 }
 
 .main-title {
     font-size: 30px;
     font-weight: 700;
     color: var(--text-primary);
+    margin: 0;
+    /* נוסף כדי לאפס רווחי דפדפן */
 }
 
 .subtitle {
@@ -133,8 +131,10 @@ body {
 .header-nav {
     display: flex;
     align-items: center;
-    padding: 40px 16px 20px 16px;
+    /* הוספת ריפוד עליון בטוח (עבור Notch) */
+    padding: calc(40px + env(safe-area-inset-top)) 16px 20px 16px;
     border-bottom: 1px solid var(--card-bg-color);
+    position: relative;
 }
 
 
@@ -144,15 +144,11 @@ body {
 /* --- מיקום אייקון האפשרויות במסך פרטי פעילות (חדש!) --- */
 
 #activity-options-icon {
-    /* מיקום אבסולוטי ביחס ל-header-nav */
     position: absolute;
-    /* מזיז את הכפתור לצד שמאל (ב-RTL) */
     left: 16px;
-    /* ממקם מעט למטה מהראש כדי לשמור על מרווח נשימה */
-    top: 40px;
-    /* שטח לחיצה גדול יותר */
+    /* התאמת מיקום ה-top לריפוד הבטוח החדש */
+    top: calc(40px + env(safe-area-inset-top));
     padding: 10px;
-    /* מוודא שהוא מעל כל אלמנט אחר */
     z-index: 20;
     cursor: pointer;
 }
@@ -160,13 +156,13 @@ body {
 #activity-options-icon svg {
     fill: var(--text-primary);
     display: block;
-    /* כדי להסיר רווחים מיותרים */
 }
 
 #warehouse-options-icon {
     position: absolute;
     left: 16px;
-    top: 40px;
+    /* התאמת מיקום ה-top לריפוד הבטוח החדש */
+    top: calc(40px + env(safe-area-inset-top));
     padding: 10px;
     z-index: 20;
     cursor: pointer;
@@ -176,9 +172,6 @@ body {
     fill: var(--text-primary);
     display: block;
 }
-
-
-/* סתם כותב משהו אני לא יודע מה אני כותב פה */
 
 .back-button {
     color: var(--action-color);
@@ -191,9 +184,25 @@ body {
     font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
-    margin: 0 auto;
-    padding-right: 40px;
-    /* פיצוי על הרוחב של "חזור" */
+    /* --- לוגיקת מרכוז חדשה --- */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    /* מגביל את הרוחב כדי לא לעלות על הכפתורים בצדדים */
+    width: calc(100% - 120px);
+    /* 60px לכל צד */
+    text-align: center;
+    /* ממכרכז את הטקסט הפנימי */
+    /* --- טיפול בגלישה --- */
+    white-space: nowrap;
+    /* מונע שבירת שורה */
+    overflow: hidden;
+    /* מסתיר מה שגולש */
+    text-overflow: ellipsis;
+    /* מוסיף "..." בסוף */
+    /* --- ניקוי הגדרות ישנות --- */
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -223,13 +232,19 @@ body {
     cursor: pointer;
     border: none;
     box-sizing: border-box;
+    /* הוספת אפקט לחיצה */
+    transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.btn:active {
+    transform: scale(0.98);
+    /* אפקט שקיעה קטן */
 }
 
 .btn-primary {
     background-color: var(--action-color);
     color: var(--text-primary);
     margin-top: 30px;
-    /* ברירת מחדל, אפשר לדרוס */
 }
 
 .btn-secondary {
@@ -303,7 +318,6 @@ body {
     color: var(--text-primary);
     padding: 16px;
     border-bottom: 1px solid #444;
-    /* תוספת מ-File 3 (עבור כפתור "ערוך") */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -316,7 +330,6 @@ body {
     background-color: var(--card-bg-color);
     border-radius: var(--border-radius);
     margin: 0 16px 20px 16px;
-    /* מרווח אחיד */
     overflow: hidden;
 }
 
@@ -328,12 +341,17 @@ body {
     border-radius: var(--border-radius);
     margin-bottom: 20px;
     overflow: hidden;
+    /* הוספת אפקט לחיצה עדין */
+    transition: transform 0.1s ease;
+}
+
+.dashboard-card:active {
+    transform: scale(0.99);
 }
 
 .card-header {
     padding: 16px;
     border-bottom: 1px solid #3a3a3a;
-    /* גבול מעט שונה */
 }
 
 .card-content {
@@ -353,6 +371,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* הוספת אפקט לחיצה */
+    transition: transform 0.1s ease;
+}
+
+.warehouse-card:active {
+    transform: scale(0.99);
 }
 
 .warehouse-card-title {
@@ -377,6 +401,12 @@ body {
     margin-bottom: 16px;
     padding: 16px;
     cursor: pointer;
+    /* הוספת אפקט לחיצה */
+    transition: transform 0.1s ease;
+}
+
+.activity-card:active {
+    transform: scale(0.99);
 }
 
 .activity-card-header {
@@ -426,7 +456,7 @@ body {
     padding: 12px 0;
     border-bottom: 1px solid #3a3a3a;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.1s ease;
 }
 
 .attention-item:last-child {
@@ -435,6 +465,10 @@ body {
 
 .attention-item:hover {
     background-color: #333;
+}
+
+.attention-item:active {
+    transform: scale(0.99);
 }
 
 .attention-details {
@@ -468,7 +502,7 @@ body {
     padding: 12px 0;
     border-bottom: 1px solid #3a3a3a;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.1s ease;
 }
 
 .activity-list-item:last-child {
@@ -477,6 +511,10 @@ body {
 
 .activity-list-item:hover {
     background-color: #333;
+}
+
+.activity-list-item:active {
+    transform: scale(0.99);
 }
 
 .activity-details {
@@ -557,9 +595,12 @@ body {
     cursor: pointer;
     background-color: rgba(255, 59, 48, 0.1);
     margin: 0 -16px;
-    /* מתיחה מקצה לקצה בתוך החלונית */
     padding: 12px 16px;
-    /* החזרת הריפוד */
+    transition: transform 0.1s ease;
+}
+
+.status-item.missing:active {
+    transform: scale(0.99);
 }
 
 .status-item.missing .status-item-title {
@@ -572,9 +613,7 @@ body {
 .equipment-item-content {
     position: relative;
     z-index: 2;
-    /* מעל הפעולה */
     background-color: var(--card-bg-color);
-    /* חובה כדי להסתיר */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -589,7 +628,6 @@ body {
 
 .equipment-item-content.open {
     transform: translateX(100px);
-    /* זז ימינה (ב-RTL) */
 }
 
 .equipment-details {
@@ -616,6 +654,41 @@ body {
 */
 
 
+/* --- עמוד לוגין (חדש) --- */
+
+#screen-login .header {
+    text-align: center;
+    /* padding-top: 80px; - מוחלף ע"י הריפוד הבטוח הכללי */
+}
+
+#screen-login .header img {
+    width: 80px;
+    height: auto;
+    opacity: 0.7;
+    /* תיקון הלוגו הכהה */
+    filter: invert(1);
+}
+
+#screen-login .login-button-container {
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+#google-login-btn svg {
+    fill: white;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+
+/* --- עמוד רשימת פעילויות ומחסנים --- */
+
+#screen-activities-list .header,
+#screen-warehouses-list .header {
+    text-align: center;
+}
+
+
 /* --- עמוד פרטי מחסן --- */
 
 .filter-chips {
@@ -640,7 +713,11 @@ body {
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s ease;
+}
+
+.chip:active {
+    transform: scale(0.95);
 }
 
 .chip.active {
@@ -666,19 +743,14 @@ body {
 }
 
 
-/* להסתרת פריטים בסינון */
-
-
 /* הפעולה שמאחור (ווידוא) */
 
 .swipe-action-left {
     position: absolute;
     top: 0;
     left: 0;
-    /* נחשף מצד שמאל (ב-RTL) */
     height: 100%;
     width: 100px;
-    /* רוחב הכפתור */
     background-color: var(--status-green);
     color: white;
     display: flex;
@@ -688,13 +760,11 @@ body {
     font-size: 14px;
     z-index: 1;
     transform: translateX(-100%);
-    /* מוסתר כברירת מחדל */
     transition: transform 0.3s ease;
 }
 
 .swipe-action-left.open {
     transform: translateX(0);
-    /* נחשף */
 }
 
 
@@ -702,10 +772,8 @@ body {
 
 .equipment-scroll-pane {
     max-height: 350px;
-    /* גובה קבוע לגלילה פנימית */
     overflow-y: auto;
     padding: 0 16px;
-    /* ריפוד פנימי */
 }
 
 .equipment-scroll-pane::-webkit-scrollbar {
@@ -733,7 +801,6 @@ body {
 .action-buttons {
     padding: 0 16px;
     margin-top: 20px;
-    /* מרווח מהכרטיס */
 }
 
 
@@ -749,11 +816,8 @@ body {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    /* צבע יוגדר לפי הקשר */
     display: inline-block;
-    /* נוסף מאיחוד */
     margin-left: 4px;
-    /* נוסף מאיחוד */
 }
 
 
@@ -885,8 +949,9 @@ body {
     display: none;
     position: absolute;
     left: 20px;
-    bottom: 100px;
-    /* מעל התפריט התחתון */
+    /* התאמת גובה ל-nav החדש + ריפוד בטוח */
+    bottom: calc(85px + env(safe-area-inset-bottom));
+    /* 65px גובה + 20px מרווח */
     width: 56px;
     height: 56px;
     background-color: var(--action-color);
@@ -899,7 +964,15 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     z-index: 90;
+    transition: transform 0.1s ease;
 }
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+
+/* ניווט תחתון */
 
 
 /* ניווט תחתון */
@@ -910,16 +983,19 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    /* גובה חדש וסטנדרטי */
+    height: 65px;
+    /* חישוב גובה כולל ריפוד בטוח */
+    height: calc(65px + env(safe-area-inset-bottom));
     background-color: var(--card-bg-color);
     border-top: 1px solid #444;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding-top: 5px;
+    /* הסרת ריפוד עליון מיותר, הריפוד התחתון מטופל ב-height */
+    padding-bottom: env(safe-area-inset-bottom);
     z-index: 90;
-    border-radius: 0 0 28px 28px;
-    /* פינות מעוגלות תחתונות */
+    /* border-radius: 20px 20px 0 0;  <-- הסרנו את השורה הזו */
 }
 
 .nav-item {
@@ -929,6 +1005,11 @@ body {
     color: var(--text-secondary);
     cursor: pointer;
     font-size: 12px;
+    transition: transform 0.1s ease;
+}
+
+.nav-item:active {
+    transform: scale(0.9);
 }
 
 .nav-item.active {
@@ -939,6 +1020,8 @@ body {
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
+    /* שינוי מילוי ל-currentColor כדי לכבד את צבע האייקון */
+    fill: currentColor;
 }
 
 
@@ -958,7 +1041,6 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
-    /* לא ניתן ללחוץ כשהוא מוסתר */
 }
 
 .modal-overlay.active {
@@ -975,15 +1057,14 @@ body {
     border-radius: 20px 20px 0 0;
     z-index: 101;
     padding: 16px;
-    padding-bottom: 30px;
+    /* הוספת ריפוד בטוח תחתון */
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
     transform: translateY(100%);
-    /* מוסתר למטה */
     transition: transform 0.3s ease;
 }
 
 .modal-container.active {
     transform: translateY(0);
-    /* גלוי */
 }
 
 .modal-title {
@@ -1010,6 +1091,11 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    transition: background-color 0.1s ease;
+}
+
+.modal-options div:active {
+    background-color: #444;
 }
 
 .modal-options div:last-child {
@@ -1033,6 +1119,11 @@ body {
     border-radius: var(--border-radius);
     cursor: pointer;
     margin-bottom: 12px;
+    transition: transform 0.1s ease;
+}
+
+.btn-edit-details:active {
+    transform: scale(0.98);
 }
 
 .btn-cancel {
@@ -1045,41 +1136,31 @@ body {
     border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.btn-cancel:active {
+    transform: scale(0.98);
 }
 
 .form-group select {
-    /* הסתרת החץ המקורי של הדפדפן */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    /* הוספת חץ מותאם אישית (SVG בצבע לבן) 
-      כדי שיתאים לעיצוב הכהה 
-    */
     background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%23ffffff%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-position: left 12px center;
-    /* מיקום החץ בצד שמאל (בגלל RTL) */
     background-size: 16px 16px;
     padding-right: 40px;
-    /* לפנות מקום לטקסט ליד החץ */
 }
-
-
-/* עיצוב האופציות עצמן שמופיעות בלחיצה */
 
 .form-group select option {
     background-color: #555;
-    /* רקע כהה לרשימה הנפתחת */
     color: var(--text-primary);
-    /* טקסט לבן */
 }
-
-
-/* תיקון קטן: כפתור שנמצא מיד אחרי טופס */
 
 .form-group+.btn-primary {
     margin-top: 10px;
-    /* קצת פחות מ-30px כדי שיהיה קרוב יותר */
 }
 
 
@@ -1087,9 +1168,6 @@ body {
 סגנונות חדשים למסך עריכת ציוד
 =================================
 */
-
-
-/* --- 1. סרגל חיפוש ופילטור --- */
 
 .search-filter-container {
     display: flex;
@@ -1135,6 +1213,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.1s ease;
+}
+
+.btn-filter:active {
+    transform: scale(0.95);
 }
 
 .btn-filter svg {
@@ -1144,14 +1227,7 @@ body {
 
 /* --- 2. רשימת בחירת ציוד --- */
 
-.equipment-selection-list {
-    /* הגובה ינוהל ע"י ה-page, לא צריך גלילה פנימית בינתיים */
-    /* max-height: 500px; */
-    /* overflow-y: auto; */
-}
-
-
-/* הסרת הגלילה הפנימית אם תתווסף */
+.equipment-selection-list {}
 
 .equipment-selection-list::-webkit-scrollbar {
     display: none;
@@ -1175,9 +1251,7 @@ body {
 .equipment-select-item .equipment-item-content {
     flex-grow: 1;
     border-bottom: none;
-    /* הסרת קו תחתון כפול */
     cursor: default;
-    /* הסרת סמן העכבר */
 }
 
 .equipment-select-checkbox {
@@ -1230,11 +1304,7 @@ body {
 
 #screen-edit-activity-equipment .details-card {
     margin-bottom: 20px;
-    /* 5. מחזיר את המרווח הרגיל (אין צורך ב-120px) */
 }
-
-
-/* הוספה בסוף הקובץ */
 
 .equipment-select-item.item-hidden {
     display: none;
@@ -1252,18 +1322,19 @@ body {
     font-size: 17px;
     font-weight: 600;
     color: var(--status-red);
-    /* טקסט אדום */
     background-color: rgba(255, 59, 48, 0.15);
-    /* רקע אדום שקוף */
     border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
     margin-bottom: 12px;
-    /* מרווח כמו שאר הכפתורים */
     font-family: 'Heebo', sans-serif;
+    transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.btn-danger:active {
+    transform: scale(0.98);
 }
 
 .btn-danger:hover {
     background-color: rgba(255, 59, 48, 0.3);
-    /* אפקט לחיצה */
 }

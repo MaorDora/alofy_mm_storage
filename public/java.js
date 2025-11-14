@@ -1274,7 +1274,15 @@ document.addEventListener("DOMContentLoaded", async() => {
                 alert("ברוך הבא, " + user.displayName + "! החשבון שלך נוצר וממתין לאישור מנהל.");
                 // כרגע נכניס אותו בכל מקרה
             }
+            const finalUser = appUser || newUserData;
 
+            if (finalUser && finalUser.name) {
+                const homeHeader = document.getElementById('home-header');
+                if (homeHeader) {
+                    // עדכון הכותרת עם השם
+                    homeHeader.innerHTML = `<h1 class="main-title">שלום, ${finalUser.name}</h1>`;
+                }
+            }
             // 3. אחרי שהכל מוכן - נרנדר את ה-UI
             renderWarehouseList();
             renderActivityList();
